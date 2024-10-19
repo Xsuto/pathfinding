@@ -1,7 +1,9 @@
-import { type Algo, BlockType, type BoardSize } from "~/libs/types";
-import { boardSizes, maxMovePerSecond } from "~/libs/utils";
+import { type Algo, BlockType } from "~/libs/types";
+import { maxMovePerSecond } from "~/libs/utils";
 import { createStore } from "solid-js/store";
-import { createEffect, onMount } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
+import { isServer } from "solid-js/web";
+import { useSession } from "vinxi/http";
 
 interface Maze {
 	id: string;
@@ -13,76 +15,75 @@ interface SettingsState {
 	movesPerSecond: number;
 	paintMode: BlockType;
 	mazes: Maze[];
-	boardSize: BoardSize;
 }
 
 const [store, setStore] = createStore<SettingsState>({
-		savedBoards: [],
-		movesPerSecond: maxMovePerSecond,
-		boardSize: boardSizes.find((it) => it.type === "Large")!,
-		paintMode: BlockType.WALL,
-		mazes: [
-			{
-				type: "Astar",
-				id: crypto.randomUUID(),
-			},
-		],
-})
+	savedBoards: [],
+	movesPerSecond: maxMovePerSecond,
+	paintMode: BlockType.WALL,
+	mazes: [
+		{
+			type: "Astar",
+			id: crypto.randomUUID(),
+		},
+	],
+});
 
-onMount(() => {
-	const savedState = localStorage.getItem("settings-state")
-	if (savedState) {
-		setStore(JSON.parse(savedState))
-	}
-
-	createEffect(() => {
-		localStorage.setItem("settings-state", JSON.stringify(store))
-	})
-})
-
-
+const [hydrated, setHydrated] = createSignal(false);
 
 export function useSettingsStore() {
+	onMount(() => {
+		if (isServer || hydrated()) return;
+		const savedState = localStorage.getItem("settings-state");
+		if (savedState) {
+			setStore(JSON.parse(savedState));
+		}
+		createEffect(() => {
+			localStorage.setItem("settings-state", JSON.stringify(store));
+		});
+
+		setHydrated(true);
+	});
 
 	function saveBoard(data: { title: string; url: string }) {
-		setStore({ ...store, 
-			savedBoards: [
-				{ ...data, id: crypto.randomUUID() },
-				...store.savedBoards,
-			],
-		})
+		setStore({
+			...store,
+			savedBoards: [{ ...data, id: crypto.randomUUID() }, ...store.savedBoards],
+		});
 	}
 
 	function deleteBoard(id: string) {
-		setStore({...store, savedBoards: store.savedBoards.filter((it) => it.id === id)})
+		setStore({
+			...store,
+			savedBoards: store.savedBoards.filter((it) => it.id === id),
+		});
 	}
 
 	function updateMovesPerSecond(moves: number) {
-		setStore({...store, movesPerSecond: moves })
+		setStore({ ...store, movesPerSecond: moves });
 	}
 	function updatePaintMode(mode: BlockType) {
-		setStore({...store, paintMode: mode })
-	}
-
-	function updateBoardSize(size: BoardSize) {
-		setStore({ ...store, boardSize: size })
+		setStore({ ...store, paintMode: mode });
 	}
 
 	function addMaze(type: Algo) {
-		setStore({ ...store, mazes:  
-			[
+		setStore({
+			...store,
+			mazes: [
 				...store.mazes,
 				{
 					type,
 					id: crypto.randomUUID(),
 				},
 			],
-		})}
+		});
+	}
 
 	function removeMaze(id: string) {
-		setStore({ ...store, 
-						mazes: store.mazes.filter((it) => it.id !== id),
-						})
+		setStore({
+			...store,
+			mazes: store.mazes.filter((it) => it.id !== id),
+		});
 	}
 
 	return {
@@ -91,8 +92,7 @@ export function useSettingsStore() {
 		deleteBoard,
 		updateMovesPerSecond,
 		updatePaintMode,
-		updateBoardSize,
 		addMaze,
-		removeMaze
-	}
+		removeMaze,
+	};
 }

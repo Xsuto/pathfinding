@@ -10,7 +10,6 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuGroupLabel,
 } from "~/components/ui/dropdown-menu";
-import { Icon } from "@iconify-icon/solid";
 import {
 	Dialog,
 	DialogContent,
@@ -21,8 +20,8 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "./ui/button";
 import { useSettingsStore } from "~/stores/settings-store";
-import { Algo, BoardSize } from "~/libs/types";
-import { DialogTriggerProps } from "@kobalte/core/dialog";
+import type { Algo, BoardSize } from "~/libs/types";
+import type { DialogTriggerProps } from "@kobalte/core/dialog";
 import {
 	algoTypeToTitle,
 	boardSizes,
@@ -30,6 +29,9 @@ import {
 	minMovePerSecond,
 } from "~/libs/utils";
 import { For, createSignal } from "solid-js";
+import { useUrlState } from "~/hooks/useUrlState";
+import { BsThreeDots } from 'solid-icons/bs'
+import { AiOutlineDelete } from 'solid-icons/ai'
 
 export function SettingsDropDownMenu({
 	onBoardSizeChange,
@@ -43,7 +45,7 @@ export function SettingsDropDownMenu({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<Icon icon="tabler:dots" />
+				<BsThreeDots />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent class="min-w-64">
 				<DropdownMenuGroup>
@@ -79,7 +81,7 @@ function SaveBoardMenuItem({
 						Save board
 					</DropdownMenuItem>
 				)}
-			></DialogTrigger>
+			/>
 			<DialogContent class="sm:max-w-[425px]">
 				<form
 					onSubmit={(e) => {
@@ -145,7 +147,7 @@ function SavedBoardsSubMenu() {
 										deleteBoard(board.id);
 									}}
 								>
-									<Icon icon="material-symbols-light:delete-outline" />
+									<AiOutlineDelete />
 								</Button>
 							</DropdownMenuItem>
 						)}
@@ -205,7 +207,7 @@ function AddAlgorithmSubMenu() {
 function ChangeBoardSizeSubMenu({
 	onChange,
 }: { onChange: (size: BoardSize) => void }) {
-	const { state } = useSettingsStore();
+	const { boardSize } = useUrlState();
 	return (
 		<DropdownMenuSub>
 			<DropdownMenuSubTrigger>
@@ -216,8 +218,7 @@ function ChangeBoardSizeSubMenu({
 					{(size) => (
 						<DropdownMenuItem onSelect={() => onChange(size)}>
 							<span>
-								{size.type}{" "}
-								{size.type === state.boardSize.type ? "(Current)" : ""}
+								{size.type} {size.type === boardSize().type ? "(Current)" : ""}
 							</span>
 						</DropdownMenuItem>
 					)}

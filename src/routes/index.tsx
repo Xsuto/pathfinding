@@ -10,10 +10,8 @@ import {
 	findBlockTypeInGrid,
 } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
-import { Icon } from "@iconify-icon/solid";
 import {
 	For,
-	createEffect,
 	createMemo,
 	createSignal,
 	startTransition,
@@ -27,11 +25,15 @@ import {
 } from "~/components/ui/toast";
 import { Footer } from "~/components/Footer";
 import { Maze, type MazeHandle } from "~/components/maze";
+import { useUrlState } from "~/hooks/useUrlState";
+import { VsDebugRestart, VsRunAll } from 'solid-icons/vs'
+import { AiOutlineClear, AiOutlineDelete } from 'solid-icons/ai'
 
 export default function Home() {
-	const { state, saveBoard, updateBoardSize, removeMaze } = useSettingsStore();
+	const { gridFromUrl, boardSize, updateBoardSize } = useUrlState();
+	const { state, saveBoard, removeMaze } = useSettingsStore();
 	const [grid, setGrid] = createSignal<Grid>(
-		clearGrid(state.boardSize.rows, state.boardSize.cols),
+		gridFromUrl() ?? clearGrid(boardSize().rows, boardSize().cols),
 	);
 
 	const startPoint = createMemo<Position | undefined>(() =>
@@ -59,8 +61,6 @@ export default function Home() {
 		})),
 	);
 
-	createEffect(() => console.log(mazeRefs()));
-
 	const { onContextMenu, isOpen, onClickOutside, position } = useContextMenu();
 
 	const runAllMazes = () => {
@@ -84,13 +84,13 @@ export default function Home() {
 				<header class="flex justify-end py-4 sticky">
 					<SettingsDropDownMenu
 						onSaveBoard={(title) => {
-							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${state.boardSize.type}&grid=${grid()
+							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${grid()
 								.map((row) => row.join(""))
 								.join("-")}`;
 							saveBoard({ title, url: fullURL });
 						}}
 						onShareBoard={() => {
-							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${state.boardSize.type}&grid=${grid()
+							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${grid()
 								.map((row) => row.join(""))
 								.join("-")}`;
 							try {
@@ -103,7 +103,7 @@ export default function Home() {
 										<ToastProgress />
 									</Toast>
 								));
-							} catch (error) {}
+							} catch (error) { }
 						}}
 						onBoardSizeChange={(size) => {
 							setGrid(clearGrid(size.rows, size.cols));
@@ -125,7 +125,7 @@ export default function Home() {
 										onClick={() => removeMaze(maze.id)}
 										variant="destructive"
 									>
-										<Icon icon="material-symbols:delete-outline" />
+										<AiOutlineDelete />
 									</Button>
 								}
 								updateSharedGridCell={(row: number, col: number) => {
@@ -169,27 +169,27 @@ export default function Home() {
 					<Button
 						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
 						onClick={() =>
-							setGrid(clearGrid(state.boardSize.rows, state.boardSize.cols))
+							setGrid(clearGrid(boardSize().rows, boardSize().cols))
 						}
 						variant="destructive"
 					>
-						<Icon icon="ant-design:clear-outlined" /> Clear grids
+						<AiOutlineClear /> Clear grids
 					</Button>
 					<Button
 						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
 						onClick={resetAllMazes}
 						variant="outline"
-						disabled={!startPoint || !goalPoint}
+						disabled={!startPoint() || !goalPoint()}
 					>
-						<Icon icon="solar:restart-linear" /> Reset all
+						<VsDebugRestart /> Reset all
 					</Button>
 					<Button
 						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
 						onClick={runAllMazes}
-						disabled={!startPoint || !goalPoint}
+						disabled={!startPoint() || !goalPoint()}
 						variant="successful"
 					>
-						<Icon icon="codicon:run-all" /> Run all
+						<VsRunAll /> Run all
 					</Button>
 				</footer>
 			</div>

@@ -47,7 +47,7 @@ export function GridIn2D({
 	const handleCellInteraction = (i: number, j: number, e?: MouseEvent) => {
 		if (e && e.buttons !== 1) return;
 		updateCell(i, j);
-	}
+	};
 
 	return (
 		<div
@@ -62,34 +62,36 @@ export function GridIn2D({
 			}}
 		>
 			<Index each={grid()}>
-				{(rows, rowsIndex) => 
+				{(rows, rowsIndex) => (
 					<Index each={rows()}>
-						{(cell, colIndex) => 
-								<button
-									type="button"
-									class={cn(
-										"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 tooltip",
-										getCellColor(cell, rowsIndex, colIndex, finalPath)
-									)}
-									onClick={() => handleCellInteraction(rowsIndex, colIndex)}
-									onMouseDown={(e) => handleCellInteraction(rowsIndex, colIndex, e)}
-									onMouseEnter={(e) => {
-										if (e.buttons === 1 && isMouseDown()) {
-											handleCellInteraction(rowsIndex, colIndex, e);
-										}
-									}}
-									data-tooltip={getBlockTypeString(cell())}
-								>
-									<CellContent
-										cellValue={cell}
-										i={rowsIndex}
-										j={colIndex}
-										finalPath={finalPath}
-									/>
-								</button>
-						}
+						{(cell, colIndex) => (
+							<button
+								type="button"
+								class={cn(
+									"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 tooltip",
+									getCellColor(cell, rowsIndex, colIndex, finalPath),
+								)}
+								onClick={() => handleCellInteraction(rowsIndex, colIndex)}
+								onMouseDown={(e) =>
+									handleCellInteraction(rowsIndex, colIndex, e)
+								}
+								onMouseEnter={(e) => {
+									if (e.buttons === 1 && isMouseDown()) {
+										handleCellInteraction(rowsIndex, colIndex, e);
+									}
+								}}
+								data-tooltip={getBlockTypeString(cell())}
+							>
+								<CellContent
+									cellValue={cell}
+									i={rowsIndex}
+									j={colIndex}
+									finalPath={finalPath}
+								/>
+							</button>
+						)}
 					</Index>
-				}
+				)}
 			</Index>
 		</div>
 	);

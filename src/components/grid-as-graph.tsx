@@ -3,7 +3,6 @@ import { BlockType, Grid, Position } from "~/libs/types";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { DialogTriggerProps } from "@kobalte/core/dialog";
 import { Button } from "./ui/button";
-import { Icon } from "@iconify-icon/solid";
 
 interface GraphNode {
   value: BlockType;
@@ -25,6 +24,12 @@ interface NodePosition {
 const NODE_RADIUS = 10;
 const HORIZONTAL_SPACING = 40;
 const VERTICAL_SPACING = 40;
+
+function GraphIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M200 156a27.87 27.87 0 0 0-19.4 7.84l-28.28-22A27.8 27.8 0 0 0 156 128a28 28 0 0 0-.45-5l19.45-6.45a28.07 28.07 0 1 0-2.53-7.58L153 115.45A28 28 0 0 0 128 100a27.7 27.7 0 0 0-7.6 1.06l-9.5-21.37A28 28 0 1 0 96 84a27.7 27.7 0 0 0 7.6-1.06l9.5 21.37a27.95 27.95 0 0 0-8.46 39.1L74 170.61a28 28 0 1 0 5.32 6l30.6-27.2a27.92 27.92 0 0 0 37.44-1.23l28.28 22A28 28 0 1 0 200 156m0-72a20 20 0 1 1-20 20a20 20 0 0 1 20-20M76 56a20 20 0 1 1 20 20a20 20 0 0 1-20-20M56 212a20 20 0 1 1 20-20a20 20 0 0 1-20 20m72-64a20 20 0 1 1 20-20a20 20 0 0 1-20 20m72 56a20 20 0 1 1 20-20a20 20 0 0 1-20 20"></path></svg>
+  )
+}
 
 const gridToGraph = (
   grid: Grid,
@@ -269,7 +274,7 @@ export function GraphView({
     <Dialog open={open()} onOpenChange={setOpen}>
       <DialogTrigger as={(props: DialogTriggerProps) => 
 	<Button type="button" variant="outline" disabled={!startPoint()} {...props}>
-	  <Icon icon="ph:graph-thin" />
+	  <GraphIcon />
 	</Button>
       }>
       </DialogTrigger>

@@ -3,7 +3,7 @@ import type { Algo, AlgorithmProps, Grid, Position } from "./types";
 import { BlockType } from "./types";
 
 export const minMovePerSecond = 1;
-export const maxMovePerSecond = 30;
+export const maxMovePerSecond = 100;
 
 export function findBlockTypeInGrid(grid: Grid, type: BlockType) {
 	for (let i = 0; i < grid.length; i++) {
@@ -53,6 +53,6 @@ export const boardSizes = [
 	{
 		type: "Giant",
 		rows: 40,
-		cols: 100,
+		cols: 80,
 	},
 ] as const;
