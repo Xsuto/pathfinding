@@ -14,7 +14,7 @@ const getCellColor = (
 	if (cellValue() === BlockType.START) return "bg-green-500";
 	if (cellValue() === BlockType.GOAL) return "bg-red-500 text-white";
 	if (finalPath().some(([x, y]) => x === i && y === j)) return "bg-green-900";
-	if (cellValue() === BlockType.VISITED) { console.log("HERE"); return "bg-green-600"};
+	if (cellValue() === BlockType.VISITED) return "bg-green-600";
 	if (cellValue() === BlockType.WALL) return "bg-stone-400";
 	return "bg-stone-200";
 };
@@ -52,7 +52,7 @@ export function GridIn2D({
 	return (
 		<div
 			class={cn(
-				"grid gap-0 w-auto max-h-full max-w-full overflow-auto",
+				"grid gap-0 w-auto max-h-full max-w-full overflow-hidden",
 				classProp,
 			)}
 			style={{

@@ -2,16 +2,15 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuItemLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 	DropdownMenuSub,
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
-    DropdownMenuGroup,
-    DropdownMenuGroupLabel,
+	DropdownMenuGroup,
+	DropdownMenuGroupLabel,
 } from "~/components/ui/dropdown-menu";
-import { Icon } from '@iconify-icon/solid';
+import { Icon } from "@iconify-icon/solid";
 import {
 	Dialog,
 	DialogContent,
@@ -24,7 +23,12 @@ import { Button } from "./ui/button";
 import { useSettingsStore } from "~/stores/settings-store";
 import { Algo, BoardSize } from "~/libs/types";
 import { DialogTriggerProps } from "@kobalte/core/dialog";
-import { algoTypeToTitle, boardSizes, maxMovePerSecond, minMovePerSecond } from "~/libs/utils";
+import {
+	algoTypeToTitle,
+	boardSizes,
+	maxMovePerSecond,
+	minMovePerSecond,
+} from "~/libs/utils";
 import { For, createSignal } from "solid-js";
 
 export function SettingsDropDownMenu({
@@ -43,14 +47,16 @@ export function SettingsDropDownMenu({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent class="min-w-64">
 				<DropdownMenuGroup>
-				<DropdownMenuGroupLabel>Settings</DropdownMenuGroupLabel>
-				<DropdownMenuSeparator />
-				<MovesPerSecondMenuItem />
-				<DropdownMenuItem onSelect={onShareBoard}>Share board</DropdownMenuItem>
-				<SaveBoardMenuItem onSaveBoard={onSaveBoard} />
-				<SavedBoardsSubMenu />
-				<AddAlgorithmSubMenu />
-				<ChangeBoardSizeSubMenu onChange={onBoardSizeChange} />
+					<DropdownMenuGroupLabel>Settings</DropdownMenuGroupLabel>
+					<DropdownMenuSeparator />
+					<MovesPerSecondMenuItem />
+					<DropdownMenuItem onSelect={onShareBoard}>
+						Share board
+					</DropdownMenuItem>
+					<SaveBoardMenuItem onSaveBoard={onSaveBoard} />
+					<SavedBoardsSubMenu />
+					<AddAlgorithmSubMenu />
+					<ChangeBoardSizeSubMenu onChange={onBoardSizeChange} />
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
@@ -67,12 +73,13 @@ function SaveBoardMenuItem({
 
 	return (
 		<Dialog open={dialogOpen()} onOpenChange={setDialogOpen}>
-			<DialogTrigger as={(props: DialogTriggerProps) => (
-				<DropdownMenuItem onSelect={(e) => e.preventDefault()} {...props}>
-					Save board
-				</DropdownMenuItem>
-			)}>
-			</DialogTrigger>
+			<DialogTrigger
+				as={(props: DialogTriggerProps) => (
+					<DropdownMenuItem onSelect={(e) => e.preventDefault()} {...props}>
+						Save board
+					</DropdownMenuItem>
+				)}
+			></DialogTrigger>
 			<DialogContent class="sm:max-w-[425px]">
 				<form
 					onSubmit={(e) => {
@@ -108,45 +115,44 @@ function SaveBoardMenuItem({
 }
 
 function SavedBoardsSubMenu() {
-	const { state, deleteBoard }= useSettingsStore();
+	const { state, deleteBoard } = useSettingsStore();
 	return (
 		<DropdownMenuSub>
 			<DropdownMenuSubTrigger>
 				<span>Saved Boards</span>
 			</DropdownMenuSubTrigger>
 			<DropdownMenuSubContent>
-				{state.savedBoards.length > 0 ? 
-					(
-						<For each={state.savedBoards}>
-							{(board) => 
-								<DropdownMenuItem
-									key={board.id}
-									class="flex gap-2"
-									onSelect={(e) => e.preventDefault()}
+				{state.savedBoards.length > 0 ? (
+					<For each={state.savedBoards}>
+						{(board) => (
+							<DropdownMenuItem
+								key={board.id}
+								class="flex gap-2"
+								onSelect={(e) => e.preventDefault()}
+							>
+								<button
+									class="flex-1 text-start"
+									type="button"
+									onClick={() => {
+										window.location.replace(board.url);
+									}}
 								>
-									<button
-										class="flex-1 text-start"
-										type="button"
-										onClick={() => {
-											window.location.replace(board.url);
-										}}
-									>
-										{board.title}
-									</button>
-									<Button
-										variant="destructive"
-										onClick={() => {
-											deleteBoard(board.id);
-										}}
-									>
-										<Icon icon="material-symbols-light:delete-outline" />
-									</Button>
-								</DropdownMenuItem>
-							}
-						</For>
-					) : (
-						<DropdownMenuItem>Empty</DropdownMenuItem>
-					)}
+									{board.title}
+								</button>
+								<Button
+									variant="destructive"
+									onClick={() => {
+										deleteBoard(board.id);
+									}}
+								>
+									<Icon icon="material-symbols-light:delete-outline" />
+								</Button>
+							</DropdownMenuItem>
+						)}
+					</For>
+				) : (
+					<DropdownMenuItem>Empty</DropdownMenuItem>
+				)}
 			</DropdownMenuSubContent>
 		</DropdownMenuSub>
 	);
@@ -159,7 +165,17 @@ function MovesPerSecondMenuItem() {
 			<span class="w-full">
 				{`Speed: ${minMovePerSecond === state.movesPerSecond ? "Slowest" : state.movesPerSecond <= 6 ? "Slow" : state.movesPerSecond <= 12 ? "Normal" : state.movesPerSecond === maxMovePerSecond ? "Instant (No animation)" : "Fast"}`}
 			</span>
-			<input type="range" min={minMovePerSecond} max={maxMovePerSecond} step={1} value={state.movesPerSecond} onChange={(e) => updateMovesPerSecond(e.target.valueAsNumber || minMovePerSecond)}/>
+			<input
+				type="range"
+				min={minMovePerSecond}
+				max={maxMovePerSecond}
+				step={1}
+				value={state.movesPerSecond}
+				onChange={(e) =>
+					updateMovesPerSecond(e.target.valueAsNumber || minMovePerSecond)
+				}
+				class="w-full"
+			/>
 		</DropdownMenuItem>
 	);
 }
@@ -173,15 +189,15 @@ function AddAlgorithmSubMenu() {
 			<DropdownMenuSubTrigger>
 				<span>Add algorithm</span>
 			</DropdownMenuSubTrigger>
-				<DropdownMenuSubContent>
-					<For each={algos}>
-						{(algo) => 
+			<DropdownMenuSubContent>
+				<For each={algos}>
+					{(algo) => (
 						<DropdownMenuItem onSelect={() => addMaze(algo)}>
 							<span>{algoTypeToTitle[algo]}</span>
 						</DropdownMenuItem>
-						}
-					</For>
-				</DropdownMenuSubContent>
+					)}
+				</For>
+			</DropdownMenuSubContent>
 		</DropdownMenuSub>
 	);
 }
@@ -189,7 +205,7 @@ function AddAlgorithmSubMenu() {
 function ChangeBoardSizeSubMenu({
 	onChange,
 }: { onChange: (size: BoardSize) => void }) {
-	const { state }= useSettingsStore();
+	const { state } = useSettingsStore();
 	return (
 		<DropdownMenuSub>
 			<DropdownMenuSubTrigger>
@@ -197,13 +213,14 @@ function ChangeBoardSizeSubMenu({
 			</DropdownMenuSubTrigger>
 			<DropdownMenuSubContent>
 				<For each={boardSizes}>
-					{(size) => 
+					{(size) => (
 						<DropdownMenuItem onSelect={() => onChange(size)}>
 							<span>
-								{size.type} {size.type === state.boardSize.type ? "(Current)" : ""}
+								{size.type}{" "}
+								{size.type === state.boardSize.type ? "(Current)" : ""}
 							</span>
 						</DropdownMenuItem>
-					}
+					)}
 				</For>
 			</DropdownMenuSubContent>
 		</DropdownMenuSub>

@@ -12,9 +12,12 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        mono: ['Roboto Mono', 'monospace'],
+      },
       colors: {
-				primaryText: "#020617",
-				primaryBackground: "#fafafa",
+        primaryText: "#020617",
+        primaryBackground: "#fafafa",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

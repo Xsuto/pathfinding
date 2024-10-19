@@ -6,6 +6,7 @@ import { type Accessor, createEffect, createSignal, type JSX, startTransition } 
 import { Button } from "./ui/button";
 import { Icon } from "@iconify-icon/solid";
 import { GridIn2D } from "./grid-in-2d";
+import { GraphView } from "./grid-as-graph";
 
 export interface GridRendererProps {
   grid: Accessor<Grid>;
@@ -130,6 +131,7 @@ export function Maze(props: GenericMazeProps) {
       <header class="flex justify-between md:min-h-16 gap-2 lg:gap-4">
         <h2 class="text-lg text-pretty">Algorithm: {props.algorithmName}</h2>
         <div class="space-x-2 shrink-0">
+          <GraphView grid={grid} startPoint={props.startPoint} updateCell={props.updateSharedGridCell} />
           {props.header}
         </div>
       </header>
