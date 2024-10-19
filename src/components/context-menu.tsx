@@ -1,37 +1,74 @@
-import type { JSX } from "solid-js";
-import {
-	ContextMenu as ShadcnContextMenu,
-	ContextMenuContent,
-	ContextMenuItem,
-	ContextMenuTrigger,
-} from "~/components/ui/context-menu";
-import { BlockType } from "~/libs/types";
-import { useSettingsStore } from "~/stores/settings-store";
+import { createSignal, Show, For, type Accessor } from 'solid-js';
+import { BlockType } from '~/libs/types';
+import { useSettingsStore } from '~/stores/settings-store';
 
-export function ContextMenu({ children }: { children: JSX.Element }) {
+interface Position {
+  x: number;
+  y: number;
+}
+
+export function useContextMenu() {
+	const [isOpen, setIsOpen] = createSignal(false);
+  const [position, setPosition] = createSignal<Position>({ x: 0, y: 0 });
+
+  const onContextMenu = (e: MouseEvent) => {
+    e.preventDefault();
+    setPosition({ x: e.clientX, y: e.clientY });
+    setIsOpen(true);
+  };
+
+  const onClickOutside = () => {
+    setIsOpen(false);
+  };
+
+  return {
+    isOpen,
+    position,
+    onContextMenu,
+    onClickOutside,
+  };
+}
+
+export function ContextMenu({ isOpen, onClickOutside, position, onContextMenu}: { isOpen: Accessor<boolean>; onClickOutside: () => void, position: Accessor<{ x: number; y: number }>; onContextMenu: (e: MouseEvent) => void }) {
+  
 	const { updatePaintMode } = useSettingsStore();
+	const items = [
+			{ label: "Set to wall", action: () => updatePaintMode(BlockType.WALL) },
+			{ label: "Set to empty", action: () => updatePaintMode(BlockType.EMPTY) },
+			{ label: "Set to start", action: () => updatePaintMode(BlockType.START) },
+			{ label: "Set to goal", action: () => updatePaintMode(BlockType.GOAL) },
+	]
+
 	return (
-		<ShadcnContextMenu>
-			<ContextMenuTrigger>
-				{ children }
-			</ContextMenuTrigger>
-			<ContextMenuContent>
-				<ContextMenuItem onSelect={() => updatePaintMode(BlockType.WALL)}>
-					Set to wall
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={() => updatePaintMode(BlockType.VISITED)}>
-					Set to visited remove me
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={() => updatePaintMode(BlockType.START)}>
-					Set to start point
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={() => updatePaintMode(BlockType.GOAL)}>
-					Set to goal point
-				</ContextMenuItem>
-				<ContextMenuItem onSelect={() => updatePaintMode(BlockType.EMPTY)}>
-					Set to empty
-				</ContextMenuItem>
-			</ContextMenuContent>
-		</ShadcnContextMenu>
-	);
+    <Show when={isOpen()}>
+      <div
+        class="fixed inset-0"
+        onClick={onClickOutside}
+        onContextMenu={onContextMenu}
+      >
+        <div
+          class="absolute bg-white shadow-lg rounded-md py-2 min-w-[200px]"
+          style={{
+            left: `${position().x}px`,
+            top: `${position().y}px`
+          }}
+        >
+          <For each={items}>
+            {(item) => (
+              <button
+								type='button'
+                class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 w-full"
+                onClick={() => {
+                  item.action();
+                  onClickOutside();
+                }}
+              >
+                <span>{item.label}</span>
+              </button>
+            )}
+          </For>
+        </div>
+      </div>
+    </Show>
+  );
 }

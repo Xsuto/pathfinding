@@ -1,8 +1,8 @@
 import { Header } from "~/components/Header";
 import { SettingsDropDownMenu } from "~/components/settings-dropdown-menu";
 import { Button } from "~/components/ui/button";
-import { ContextMenu } from "~/components/context-menu";
-import { BlockType, Position, type Grid } from "~/libs/types";
+import { ContextMenu, useContextMenu } from "~/components/context-menu";
+import { BlockType, type Position, type Grid } from "~/libs/types";
 import { algoTypeToFunc, algoTypeToTitle, clearGrid, findBlockTypeInGrid } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
 import { Icon } from '@iconify-icon/solid';
@@ -17,6 +17,7 @@ import {
 import { Footer } from "~/components/Footer";
 import { Maze, type MazeHandle } from "~/components/maze";
 
+
 export default function Home() {
 	const { state, saveBoard, updateBoardSize, removeMaze } = useSettingsStore()
 	const [grid, setGrid] = createSignal<Grid>(clearGrid(state.boardSize.rows, state.boardSize.cols))
@@ -29,6 +30,8 @@ export default function Home() {
 		() => findBlockTypeInGrid(grid(), BlockType.GOAL),
 	);
 
+	const [mazeRefs, setMazeRefs] = createSignal<Record<string, MazeHandle>>({});
+
 	const mazes = createMemo(
 		() =>
 			state.mazes.map((it) => ({
@@ -38,14 +41,23 @@ export default function Home() {
 			})),
 	);
 
+	const { onContextMenu, isOpen, onClickOutside, position } = useContextMenu();
 
 	const runAllMazes = async () => {
-		console.log(mazes().map(it => it?.ref))
-		const promises = mazes()
-		.filter((maze) => !maze.ref?.current?.isRunning)
-		.map((maze) => maze.ref?.current?.start());
-		await Promise.all(promises);
-	};
+    const refs = mazeRefs();
+    const promises = Object.values(refs)
+      .filter((maze) => !maze.isRunning)
+      .map((maze) => maze.start());
+    await Promise.all(promises);
+  };
+
+	const resetAllMazes = async () => {
+    const refs = mazeRefs();
+    const promises = Object.values(refs)
+      .filter((maze) => !maze.isRunning)
+      .map((maze) => maze.restart());
+    await Promise.all(promises);
+  };
 
 	return (
 		<div class="flex flex-col gap-8 relative h-screen w-screen overflow-auto">
@@ -78,15 +90,17 @@ export default function Home() {
 						}}
 					/>
 				</header>
-				<ContextMenu>
 					<main
+						onContextMenu={onContextMenu}
 						class="flex flex-wrap overflow-auto contain-content gap-4 relative"
 						// NOTE: we might need a key here
 					>
 						<For each={mazes()}>
 							{(maze) => 
 								<Maze
-									ref={maze.ref}
+									ref={(handle) => {
+										setMazeRefs(prev => ({...prev, [maze.id]: handle}));
+									}}
 									sharedGrid={grid}
 									header={
 										<Button
@@ -126,7 +140,7 @@ export default function Home() {
 							}
 						</For>
 					</main>
-				</ContextMenu>
+				<ContextMenu onClickOutside={onClickOutside} isOpen={isOpen} position={position} onContextMenu={onContextMenu}/>
 				<footer class="py-4 flex justify-end gap-2">
 					<Button
 						class="rounded-full flex flex-row items-center gap-2 justify-center py-5 w-36"
@@ -134,6 +148,14 @@ export default function Home() {
 						variant="destructive"
 					>
 						<Icon icon="ant-design:clear-outlined" /> Clear grids
+					</Button>
+					<Button
+						class="rounded-full flex flex-row items-center gap-2 justify-center py-5 w-32"
+						onClick={resetAllMazes}
+						variant="outline"
+						disabled={!startPoint || !goalPoint}
+					>
+            <Icon icon="solar:restart-linear" /> Reset all
 					</Button>
 					<Button
 						class="rounded-full flex flex-row items-center gap-2 justify-center py-5 w-32"

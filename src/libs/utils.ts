@@ -52,7 +52,7 @@ export const boardSizes = [
 	},
 	{
 		type: "Giant",
-		rows: 100,
-		cols: 40,
+		rows: 40,
+		cols: 100,
 	},
 ] as const;
