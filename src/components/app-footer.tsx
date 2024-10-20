@@ -1,4 +1,4 @@
-export function Footer() {
+export function AppFooter() {
 	return (
 		<footer class="bg-muted py-4 border-t mt-auto shrink-0">
 			<div class="container mx-auto flex items-center justify-between px-4">

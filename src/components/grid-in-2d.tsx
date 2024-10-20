@@ -84,7 +84,7 @@ export function GridIn2D({
 							<button
 								type="button"
 								class={cn(
-									"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 md:min-w-6 md:min-h-6 tooltip",
+									"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 md:min-w-6 md:min-h-6 tooltip aspect-square",
 									getCellColor(
 										cell,
 										rowsIndex,

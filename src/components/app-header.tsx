@@ -1,5 +1,3 @@
-import { A } from "@solidjs/router";
-
 function LogoIcon() {
 	return (
 		<svg
@@ -18,18 +16,14 @@ function LogoIcon() {
 	);
 }
 
-export function Header() {
+export function AppHeader() {
 	return (
 		<header class="flex items-center justify-between px-6 py-4 border-b bg-background shrink-0">
-			<A href="/" class="flex items-center gap-2">
+			<h1 class="flex items-center gap-2">
 				<LogoIcon />
 				<span class="text-lg font-semibold">Pathfinding Visualizer</span>
-			</A>
-			<nav class="flex items-center gap-4">
-				<a href="/algorithms" class="text-sm font-medium hover:underline">
-					Algorithms
-				</a>
-			</nav>
+			</h1>
+			<nav class="flex items-center gap-4" />
 		</header>
 	);
 }

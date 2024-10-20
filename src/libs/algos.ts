@@ -354,7 +354,7 @@ async function expandFrontier(
 	rows: number,
 	cols: number,
 	grid: number[][],
-	markCellAsVisited: (x: number, y: number) => Promise<void>,
+	markCellAsVisited: (row: number, col: number) => Promise<void>,
 ): Promise<Position | null> {
 	if (queue.length === 0) return null;
 

@@ -62,6 +62,7 @@ export function useSettingsStore() {
 		setStore({ ...store, movesPerSecond: moves });
 	}
 	function updatePaintMode(mode: BlockType) {
+		console.log(mode);
 		setStore({ ...store, paintMode: mode });
 	}
 

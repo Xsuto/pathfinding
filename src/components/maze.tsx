@@ -13,13 +13,13 @@ import {
 	createEffect,
 	createMemo,
 	createSignal,
-	type JSX,
 	startTransition,
 } from "solid-js";
 import { Button } from "./ui/button";
 import { VsDebugRestart, VsDebugStart } from "solid-icons/vs";
 import { GridIn2D } from "./grid-in-2d";
 import { GraphView } from "./grid-as-graph";
+import { AiOutlineDelete } from "solid-icons/ai";
 
 interface GenericMazeProps {
 	sharedGrid: Accessor<Grid>;
@@ -28,8 +28,8 @@ interface GenericMazeProps {
 	algorithmName: string;
 	startPoint: Accessor<Position | undefined>;
 	goalPoint: Accessor<Position | undefined>;
+	removeMaze: () => void;
 	ref?: (handle: MazeHandle) => void;
-	header?: JSX.Element;
 }
 
 export interface MazeHandle {
@@ -48,8 +48,8 @@ export function Maze(props: GenericMazeProps) {
 			if (!finalPathFound) return "0";
 			return finalPath()
 				.reduce((acc, cell) => {
-					const cellValue = props.sharedGrid()[cell[0]][cell[1]];
-					return cellValue !== BlockType.START && cellValue !== BlockType.GOAL
+					const cellValue = props.sharedGrid().at(cell[0])?.at(cell[1]);
+					return cellValue && cellValue !== BlockType.START && cellValue !== BlockType.GOAL
 						? acc + cellValue - BlockType.TERRAIN_EASY + 1
 						: acc;
 				}, 0)
@@ -144,7 +144,7 @@ export function Maze(props: GenericMazeProps) {
 	});
 
 	return (
-		<div class="lg:p-4 flex flex-col gap-2 border rounded min-w-96">
+		<div class="lg:p-4 py-4 flex flex-col gap-2 border rounded min-w-96">
 			<header class="flex justify-between md:min-h-16 gap-2 lg:gap-4 @container">
 				<h1 class="md:text-lg text-pretty w-80 @md:w-fit">
 					Algorithm: {props.algorithmName}
@@ -155,7 +155,9 @@ export function Maze(props: GenericMazeProps) {
 						startPoint={props.startPoint}
 						updateCell={props.updateSharedGridCell}
 					/>
-					{props.header}
+					<Button onClick={props.removeMaze} variant="destructive">
+						<AiOutlineDelete />
+					</Button>
 				</div>
 			</header>
 			<GridIn2D

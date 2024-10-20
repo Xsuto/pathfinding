@@ -10,37 +10,24 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuGroupLabel,
 } from "~/components/ui/dropdown-menu";
-import {
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "~/components/ui/dialog";
 import { Button } from "./ui/button";
 import { useSettingsStore } from "~/stores/settings-store";
 import type { Algo, BoardSize } from "~/libs/types";
-import type { DialogTriggerProps } from "@kobalte/core/dialog";
 import {
-    algoTypeToFunc,
+	algoTypeToFunc,
 	algoTypeToTitle,
 	boardSizes,
 	maxMovePerSecond,
 	minMovePerSecond,
 } from "~/libs/utils";
-import { For, Match, Switch, createSignal } from "solid-js";
+import { For } from "solid-js";
 import { useUrlState } from "~/hooks/useUrlState";
 import { BsThreeDots } from "solid-icons/bs";
 import { AiOutlineDelete } from "solid-icons/ai";
 
 export function SettingsDropDownMenu({
 	onBoardSizeChange,
-	onShareBoard,
-	onSaveBoard,
 }: {
-	onShareBoard: () => void;
-	onSaveBoard: (title: string) => void;
 	onBoardSizeChange: (size: BoardSize) => void;
 }) {
 	return (
@@ -53,67 +40,12 @@ export function SettingsDropDownMenu({
 					<DropdownMenuGroupLabel>Settings</DropdownMenuGroupLabel>
 					<DropdownMenuSeparator />
 					<MovesPerSecondMenuItem />
-					<DropdownMenuItem onSelect={onShareBoard}>
-						Share board
-					</DropdownMenuItem>
-					<SaveBoardMenuItem onSaveBoard={onSaveBoard} />
 					<SavedBoardsSubMenu />
 					<AddAlgorithmSubMenu />
 					<ChangeBoardSizeSubMenu onChange={onBoardSizeChange} />
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
-	);
-}
-
-function SaveBoardMenuItem({
-	onSaveBoard,
-}: {
-	onSaveBoard: (title: string) => void;
-}) {
-	const [title, setTitle] = createSignal("");
-	const [dialogOpen, setDialogOpen] = createSignal(false);
-
-	return (
-		<Dialog open={dialogOpen()} onOpenChange={setDialogOpen}>
-			<DialogTrigger
-				as={(props: DialogTriggerProps) => (
-					<DropdownMenuItem closeOnSelect={false} {...props}>
-						Save board
-					</DropdownMenuItem>
-				)}
-			/>
-			<DialogContent class="sm:max-w-[425px]">
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						onSaveBoard(title());
-						setTitle("");
-						setDialogOpen(false);
-					}}
-				>
-					<DialogHeader>
-						<DialogTitle>Save board</DialogTitle>
-					</DialogHeader>
-					<div class="grid gap-4 py-4">
-						<div class="grid grid-cols-4 items-center gap-4">
-							<label for="title" class="text-right">
-								Title
-							</label>
-							<input
-								id="title"
-								class="col-span-3"
-								onChange={(e) => setTitle(e.target.value)}
-								value={title()}
-							/>
-						</div>
-					</div>
-					<DialogFooter>
-						<Button type="submit">Save</Button>
-					</DialogFooter>
-				</form>
-			</DialogContent>
-		</Dialog>
 	);
 }
 

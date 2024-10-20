@@ -23,9 +23,13 @@ export function useUrlState() {
 	const grid = createMemo(() => {
 		const grid = searchParams.grid;
 		const decodedGrid = grid ? (decodeGrid(grid as string) as Grid) : undefined;
-		return isUrlGridValid(boardSize(), decodedGrid)
-			? decodedGrid!
-			: updateGrid(clearGrid(boardSize().rows, boardSize().cols));
+
+		if (isUrlGridValid(boardSize(), decodedGrid)) {
+			return decodedGrid!;
+		}
+		const newGrid = clearGrid(boardSize().rows, boardSize().cols);
+		updateGrid(newGrid);
+		return newGrid;
 	}, [searchParams]);
 
 	function updateBoardSize(size: BoardSize) {

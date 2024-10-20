@@ -1,6 +1,3 @@
-import { Header } from "~/components/Header";
-import { SettingsDropDownMenu } from "~/components/settings-dropdown-menu";
-import { Button } from "~/components/ui/button";
 import { ContextMenu, useContextMenu } from "~/components/context-menu";
 import { BlockType, type Position } from "~/libs/types";
 import {
@@ -11,22 +8,14 @@ import {
 } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
 import { For, createMemo, createSignal, startTransition } from "solid-js";
-import { toaster } from "@kobalte/core";
-import {
-	Toast,
-	ToastContent,
-	ToastProgress,
-	ToastTitle,
-} from "~/components/ui/toast";
-import { Footer } from "~/components/Footer";
 import { Maze, type MazeHandle } from "~/components/maze";
 import { useUrlState } from "~/hooks/useUrlState";
-import { VsDebugRestart, VsRunAll } from "solid-icons/vs";
-import { AiOutlineClear, AiOutlineDelete } from "solid-icons/ai";
+import { BoardHeader } from "~/components/board-header";
+import { BoardFooter } from "~/components/board-footer";
 
 export default function Home() {
-	const { grid, updateGrid, boardSize, updateBoardSize } = useUrlState();
-	const { state, saveBoard, removeMaze } = useSettingsStore();
+	const { grid, updateGrid, boardSize } = useUrlState();
+	const { state, removeMaze } = useSettingsStore();
 
 	const startPoint = createMemo<Position | undefined>(() =>
 		findBlockTypeInGrid(grid(), BlockType.START),
@@ -70,121 +59,64 @@ export default function Home() {
 	};
 
 	return (
-		<div class="flex flex-col gap-8 relative h-screen w-screen overflow-auto">
-			<Header />
-			<div class="md:p-4 border rounded-xl border-stone-300 shadow-lg flex flex-col justify-between  relative lg:mx-4 flex-grow overflow-hidden">
-				<header class="flex justify-end py-4 sticky">
-					<SettingsDropDownMenu
-						onSaveBoard={(title) => {
-							saveBoard({ title, url: window.location.href });
-						}}
-						onShareBoard={() => {
-							try {
-								navigator.clipboard.writeText(window.location.href);
-								toaster.show((props) => (
-									<Toast toastId={props.toastId}>
-										<ToastContent>
-											<ToastTitle>Url saved to Clipboard</ToastTitle>
-										</ToastContent>
-										<ToastProgress />
-									</Toast>
-								));
-							} catch (error) {
-								console.error(error);
-							}
-						}}
-						onBoardSizeChange={(size) => {
-							updateGrid(clearGrid(size.rows, size.cols));
-							updateBoardSize(size);
-						}}
-					/>
-				</header>
-				<main
-					onContextMenu={onContextMenu}
-					class="flex flex-wrap overflow-auto contain-content gap-4 relative justify-center"
-				>
-					<For each={mazes()}>
-						{(maze) => (
-							<Maze
-								ref={(handle) => setMazeRef(maze.id, handle)}
-								sharedGrid={grid}
-								header={
-									<Button
-										onClick={() => removeMaze(maze.id)}
-										variant="destructive"
-									>
-										<AiOutlineDelete />
-									</Button>
-								}
-								updateSharedGridCell={(row: number, col: number) => {
-									if (
-										Array.from(mazeRefs().values()).some(
-											(maze) => maze.isRunning,
-										)
-									)
-										return;
-									startTransition(() => {
-										const newGrid = grid().map((value, i) =>
-											value.map((val, j) => {
-												if (
-													state.paintMode === BlockType.GOAL ||
-													state.paintMode === BlockType.START
-												) {
-													return i === row && j === col
-														? state.paintMode
-														: val === state.paintMode
-															? BlockType.TERRAIN_EASY
-															: val;
-												}
-												return i === row && j === col ? state.paintMode : val;
-											}),
-										);
-										updateGrid(newGrid);
-									});
-								}}
-								algorithm={maze.algo}
-								algorithmName={algoTypeToTitle[maze.type]}
-								startPoint={startPoint}
-								goalPoint={goalPoint}
-							/>
-						)}
-					</For>
-				</main>
-				<ContextMenu
-					onClickOutside={onClickOutside}
-					isOpen={isOpen}
-					position={position}
-					onContextMenu={onContextMenu}
-				/>
-				<footer class="py-4 flex justify-end gap-2">
-					<Button
-						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
-						onClick={() =>
-							updateGrid(clearGrid(boardSize().rows, boardSize().cols))
-						}
-						variant="destructive"
-					>
-						<AiOutlineClear /> Clear grids
-					</Button>
-					<Button
-						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
-						onClick={resetAllMazes}
-						variant="outline"
-						disabled={!startPoint() || !goalPoint()}
-					>
-						<VsDebugRestart /> Reset all
-					</Button>
-					<Button
-						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
-						onClick={runAllMazes}
-						disabled={!startPoint() || !goalPoint()}
-						variant="successful"
-					>
-						<VsRunAll /> Run all
-					</Button>
-				</footer>
-			</div>
-			<Footer />
+		<div class="md:p-4 border rounded-xl border-stone-300 shadow-lg flex flex-col justify-between  relative lg:mx-4 flex-grow overflow-hidden">
+			<BoardHeader />
+			<main
+				onContextMenu={onContextMenu}
+				class="flex flex-wrap overflow-auto contain-content gap-4 relative justify-center"
+			>
+				<For each={mazes()}>
+					{(maze) => (
+						<Maze
+							ref={(handle) => setMazeRef(maze.id, handle)}
+							sharedGrid={grid}
+							updateSharedGridCell={(row: number, col: number) => {
+								if (
+									Array.from(mazeRefs().values()).some((maze) => maze.isRunning)
+								)
+									return;
+								startTransition(() => {
+									const newGrid = grid().map((value, i) =>
+										value.map((val, j) => {
+											if (
+												state.paintMode === BlockType.GOAL ||
+												state.paintMode === BlockType.START
+											) {
+												return i === row && j === col
+													? state.paintMode
+													: val === state.paintMode
+														? BlockType.TERRAIN_EASY
+														: val;
+											}
+											return i === row && j === col ? state.paintMode : val;
+										}),
+									);
+									updateGrid(newGrid);
+								});
+							}}
+							algorithm={maze.algo}
+							algorithmName={algoTypeToTitle[maze.type]}
+							startPoint={startPoint}
+							goalPoint={goalPoint}
+							removeMaze={() => removeMaze(maze.id)}
+						/>
+					)}
+				</For>
+			</main>
+			<ContextMenu
+				onClickOutside={onClickOutside}
+				isOpen={isOpen}
+				position={position}
+				onContextMenu={onContextMenu}
+			/>
+			<BoardFooter
+				canStartMazes={() => !!startPoint() && !!goalPoint()}
+				runAllMazes={runAllMazes}
+				resetAllMazes={resetAllMazes}
+				clearGrid={() =>
+					updateGrid(clearGrid(boardSize().rows, boardSize().cols))
+				}
+			/>
 		</div>
 	);
 }

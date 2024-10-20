@@ -39,26 +39,26 @@ export function decodeGrid(grid: string) {
 	const hasEncoding = grid.includes("c");
 	return hasEncoding
 		? grid.split("-").map((str: string) => {
-			if (!str) return "";
-			let result = "";
+				if (!str) return "";
+				let result = "";
 
-			const parts = str.split("v");
-			for (const part of parts) {
-				if (!part) continue;
+				const parts = str.split("v");
+				for (const part of parts) {
+					if (!part) continue;
 
-				const [count, char] = part.split("c");
-				if (char) {
-					result += char.repeat(Number.parseInt(count));
-				} else {
-					result += part;
+					const [count, char] = part.split("c");
+					if (char) {
+						result += char.repeat(Number.parseInt(count));
+					} else {
+						result += part;
+					}
 				}
-			}
 
-			return result.split("").map(Number) as BlockType[];
-		})
+				return result.split("").map(Number) as BlockType[];
+			})
 		: grid
-			.split("-")
-			.map((str: string) => str.split("").map(Number) as BlockType[]);
+				.split("-")
+				.map((str: string) => str.split("").map(Number) as BlockType[]);
 }
 
 export function findBlockTypeInGrid(grid: Grid, type: BlockType) {
@@ -92,6 +92,26 @@ export const algoTypeToTitle = {
 	Dijkstra: "Dijkstra search",
 } satisfies Record<Algo, string>;
 
+export const paintModes = [
+	{ label: "Start Node", type: BlockType.START },
+	{ label: "Goal Node", type: BlockType.GOAL },
+	{
+		label: "Easy Path",
+		type: BlockType.TERRAIN_EASY,
+	},
+	{
+		label: "Medium Path",
+		type: BlockType.TERRAIN_MEDIUM,
+	},
+	{
+		label: "Hard Path",
+		type: BlockType.TERRAIN_HARD,
+	},
+	{
+		label: "Wall",
+		type: BlockType.TERRAIN_IMPOSSIBLE,
+	},
+];
 export const boardSizes = [
 	{
 		type: "Small",

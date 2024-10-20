@@ -71,6 +71,12 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+#app,
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
 .tooltip {
   position: relative;
 }
