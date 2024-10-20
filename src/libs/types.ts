@@ -6,11 +6,12 @@ export interface BoardSize {
 }
 
 export enum BlockType {
-	EMPTY = 0,
-	VISITED = 1,
-	START = 2,
-	GOAL = 3,
-	WALL = 4, 
+	START = 1,
+	GOAL = 2,
+	TERRAIN_EASY = 3,
+	TERRAIN_MEDIUM = 4,
+	TERRAIN_HARD = 5,
+	TERRAIN_IMPOSSIBLE = 6
 }
 
 export type Grid = BlockType[][];
@@ -18,7 +19,7 @@ export type Position = [number, number];
 
 export class AlgorithmAborted extends Error {}
 
-export type Algo = "Astar" | "BFS" | "DFS" | "BI";
+export type Algo = "Astar" | "BFS" | "DFS" | "BI" | "Dijkstra";
 
 export interface AlgorithmProps {
 	start: Position;
@@ -26,5 +27,5 @@ export interface AlgorithmProps {
 	rows: number;
 	cols: number;
 	grid: number[][];
-	updateCell: (row: number, col: number, value: number) => Promise<void>;
+	markCellAsVisited: (row: number, col: number) => Promise<void>;
 }

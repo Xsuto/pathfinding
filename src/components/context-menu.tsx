@@ -1,6 +1,7 @@
-import { createSignal, Show, For, type Accessor } from 'solid-js';
-import { BlockType } from '~/libs/types';
-import { useSettingsStore } from '~/stores/settings-store';
+import { action } from "@solidjs/router";
+import { createSignal, Show, For, type Accessor } from "solid-js";
+import { BlockType } from "~/libs/types";
+import { useSettingsStore } from "~/stores/settings-store";
 
 interface Position {
   x: number;
@@ -29,15 +30,38 @@ export function useContextMenu() {
   };
 }
 
-export function ContextMenu({ isOpen, onClickOutside, position, onContextMenu}: { isOpen: Accessor<boolean>; onClickOutside: () => void, position: Accessor<{ x: number; y: number }>; onContextMenu: (e: MouseEvent) => void }) {
-
+export function ContextMenu({
+  isOpen,
+  onClickOutside,
+  position,
+  onContextMenu,
+}: {
+  isOpen: Accessor<boolean>;
+  onClickOutside: () => void;
+  position: Accessor<{ x: number; y: number }>;
+  onContextMenu: (e: MouseEvent) => void;
+}) {
   const { updatePaintMode } = useSettingsStore();
   const items = [
-    { label: "Set to wall", action: () => updatePaintMode(BlockType.WALL) },
-    { label: "Set to empty", action: () => updatePaintMode(BlockType.EMPTY) },
-    { label: "Set to start", action: () => updatePaintMode(BlockType.START) },
-    { label: "Set to goal", action: () => updatePaintMode(BlockType.GOAL) },
-  ]
+    { label: "Start Node", action: () => updatePaintMode(BlockType.START) },
+    { label: "Goal Node", action: () => updatePaintMode(BlockType.GOAL) },
+    {
+      label: "Easy Path",
+      action: () => updatePaintMode(BlockType.TERRAIN_EASY),
+    },
+    {
+      label: "Medium Path",
+      action: () => updatePaintMode(BlockType.TERRAIN_MEDIUM),
+    },
+    {
+      label: "Hard Path",
+      action: () => updatePaintMode(BlockType.TERRAIN_HARD),
+    },
+    {
+      label: "Wall",
+      action: () => updatePaintMode(BlockType.TERRAIN_IMPOSSIBLE),
+    },
+  ];
 
   return (
     <Show when={isOpen()}>
@@ -56,7 +80,7 @@ export function ContextMenu({ isOpen, onClickOutside, position, onContextMenu}: 
           <For each={items}>
             {(item) => (
               <button
-                type='button'
+                type="button"
                 class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 w-full"
                 onClick={() => {
                   item.action();

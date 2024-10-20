@@ -7,7 +7,17 @@ const isValid = (
 	cols: number,
 	grid: number[][],
 ) => {
-	return x >= 0 && x < rows && y >= 0 && y < cols && grid[x][y] !== BlockType.WALL;
+	return (
+		x >= 0 &&
+		x < rows &&
+		y >= 0 &&
+		y < cols &&
+		grid[x][y] !== BlockType.TERRAIN_IMPOSSIBLE
+	);
+};
+
+const getTerrainCost = (cellValue: BlockType) => {
+	return cellValue - BlockType.TERRAIN_EASY + 1;
 };
 
 export const dfs = async ({
@@ -16,7 +26,7 @@ export const dfs = async ({
 	rows,
 	cols,
 	grid,
-	updateCell,
+	markCellAsVisited,
 }: AlgorithmProps): Promise<Position[] | null> => {
 	const stack: Position[] = [start];
 	const visited: boolean[][] = Array(rows)
@@ -42,7 +52,7 @@ export const dfs = async ({
 
 		if (!visited[x][y]) {
 			visited[x][y] = true;
-			await updateCell(x, y, 1);
+			await markCellAsVisited(x, y);
 
 			const directions: Position[] = [
 				[1, 0],
@@ -70,7 +80,7 @@ export const bfs = async ({
 	rows,
 	cols,
 	grid,
-	updateCell,
+	markCellAsVisited,
 }: AlgorithmProps): Promise<Position[] | null> => {
 	const queue: Position[] = [start];
 	const visited: boolean[][] = Array(rows)
@@ -95,7 +105,7 @@ export const bfs = async ({
 		}
 
 		visited[x][y] = true;
-		await updateCell(x, y, 1);
+		await markCellAsVisited(x, y);
 
 		const directions: Position[] = [
 			[1, 0],
@@ -123,7 +133,7 @@ export const aStar = async ({
 	rows,
 	cols,
 	grid,
-	updateCell,
+	markCellAsVisited,
 }: AlgorithmProps): Promise<Position[] | null> => {
 	const heuristic = (x1: number, y1: number, x2: number, y2: number) =>
 		Math.abs(x1 - x2) + Math.abs(y1 - y2);
@@ -161,7 +171,7 @@ export const aStar = async ({
 		}
 
 		closedSet.add(`${x},${y}`);
-		await updateCell(x, y, 1);
+		await markCellAsVisited(x, y);
 
 		const directions: Position[] = [
 			[1, 0],
@@ -176,7 +186,8 @@ export const aStar = async ({
 				isValid(newX, newY, rows, cols, grid) &&
 				!closedSet.has(`${newX},${newY}`)
 			) {
-				const newG = g + 1;
+				const terrainCost = getTerrainCost(grid[newX][newY]);
+				const newG = g + terrainCost;
 				const newF = newG + heuristic(newX, newY, goal[0], goal[1]);
 
 				const existingNode = openList.find(
@@ -198,6 +209,91 @@ export const aStar = async ({
 	return null; // No path found
 };
 
+export const dijkstra = async ({
+	start,
+	goal,
+	rows,
+	cols,
+	grid,
+	markCellAsVisited,
+}: AlgorithmProps): Promise<Position[] | null> => {
+	interface Node {
+		pos: Position;
+		distance: number;
+	}
+
+	const distances: number[][] = Array(rows)
+		.fill(null)
+		.map(() => Array(cols).fill(Number.POSITIVE_INFINITY));
+
+	const parent: (Position | null)[][] = Array(rows)
+		.fill(null)
+		.map(() => Array(cols).fill(null));
+
+	const openList: Node[] = [{ pos: start, distance: 0 }];
+	const closedSet: Set<string> = new Set();
+	distances[start[0]][start[1]] = 0;
+
+	while (openList.length > 0) {
+		openList.sort((a, b) => a.distance - b.distance);
+		const {
+			pos: [x, y],
+			distance,
+		} = openList.shift()!;
+
+		if (x === goal[0] && y === goal[1]) {
+			// Reconstruct path
+			const path: Position[] = [];
+			let current: Position | null = [x, y];
+			while (current) {
+				path.unshift(current);
+				current = parent[current[0]][current[1]];
+			}
+			return path;
+		}
+
+		closedSet.add(`${x},${y}`);
+		await markCellAsVisited(x, y);
+
+		const directions: Position[] = [
+			[1, 0],
+			[-1, 0],
+			[0, 1],
+			[0, -1],
+		];
+
+		for (const [dx, dy] of directions) {
+			const newX = x + dx;
+			const newY = y + dy;
+
+			if (
+				isValid(newX, newY, rows, cols, grid) &&
+				!closedSet.has(`${newX},${newY}`)
+			) {
+				const terrainCost = getTerrainCost(grid[newX][newY]);
+				const newDistance = distance + terrainCost;
+
+				if (newDistance < distances[newX][newY]) {
+					distances[newX][newY] = newDistance;
+					parent[newX][newY] = [x, y];
+
+					const existingNode = openList.find(
+						(node) => node.pos[0] === newX && node.pos[1] === newY,
+					);
+
+					if (existingNode) {
+						existingNode.distance = newDistance;
+					} else {
+						openList.push({ pos: [newX, newY], distance: newDistance });
+					}
+				}
+			}
+		}
+	}
+
+	return null; // No path found
+};
+
 interface Node {
 	pos: Position;
 	parent: Position | null;
@@ -209,7 +305,7 @@ export const bidirectionalSearch = async ({
 	rows,
 	cols,
 	grid,
-	updateCell,
+	markCellAsVisited,
 }: AlgorithmProps): Promise<Position[] | null> => {
 	const forwardQueue: Node[] = [{ pos: start, parent: null }];
 	const backwardQueue: Node[] = [{ pos: goal, parent: null }];
@@ -227,7 +323,7 @@ export const bidirectionalSearch = async ({
 			rows,
 			cols,
 			grid,
-			updateCell,
+			markCellAsVisited,
 		);
 		if (meetingPoint) break;
 
@@ -239,7 +335,7 @@ export const bidirectionalSearch = async ({
 			rows,
 			cols,
 			grid,
-			updateCell,
+			markCellAsVisited,
 		);
 		if (meetingPoint) break;
 	}
@@ -258,7 +354,7 @@ async function expandFrontier(
 	rows: number,
 	cols: number,
 	grid: number[][],
-	updateCell: (x: number, y: number, value: number) => Promise<void>,
+	markCellAsVisited: (x: number, y: number) => Promise<void>,
 ): Promise<Position | null> {
 	if (queue.length === 0) return null;
 
@@ -271,7 +367,7 @@ async function expandFrontier(
 	if (visited.has(posKey)) return null;
 	visited.set(posKey, { pos: [x, y], parent });
 
-	await updateCell(x, y, 1);
+	await markCellAsVisited(x, y);
 
 	if (otherVisited.has(posKey)) {
 		return [x, y]; // Meeting point found

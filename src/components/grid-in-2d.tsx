@@ -5,41 +5,58 @@ import { type Accessor, Index, createMemo } from "solid-js";
 import { CellContent } from "./cell-content";
 
 const getCellColor = (
-	cellValue: () => number,
+	cellValue: () => BlockType,
 	i: number,
 	j: number,
 	finalPath: () => Grid,
+	visitedCells: () => Position[],
 ) => {
 	if (cellValue() === BlockType.START) return "bg-green-500";
 	if (cellValue() === BlockType.GOAL) return "bg-red-500 text-white";
+	if (cellValue() === BlockType.TERRAIN_IMPOSSIBLE) return "bg-stone-400";
 	if (finalPath().some(([x, y]) => x === i && y === j)) return "bg-green-900";
-	if (cellValue() === BlockType.VISITED) return "bg-green-600";
-	if (cellValue() === BlockType.WALL) return "bg-stone-400";
+	if (visitedCells().some(([x, y]) => x === i && y === j))
+		return "bg-green-700";
 	return "bg-stone-200";
 };
 
-const getBlockTypeString = (cellValue: number): string => {
-	switch (cellValue) {
+const getBlockTypeString = (
+	cellValue: () => BlockType,
+	i: number,
+	j: number,
+	finalPath: () => Grid,
+	visitedCells: () => Position[],
+): string => {
+	if (finalPath().some(([x, y]) => x === i && y === j)) return "Final path";
+	if (visitedCells().some(([x, y]) => x === i && y === j))
+		return "Visited cell";
+	switch (cellValue()) {
 		case BlockType.START:
 			return "Start";
 		case BlockType.GOAL:
 			return "Goal";
-		case BlockType.VISITED:
-			return "Visited";
-		case BlockType.WALL:
-			return "Wall";
+		case BlockType.TERRAIN_EASY:
+			return "Easy difficulty terrain";
+		case BlockType.TERRAIN_MEDIUM:
+			return "Medium difficulty terrain";
+		case BlockType.TERRAIN_HARD:
+			return "Hard difficulty terrain";
+		case BlockType.TERRAIN_IMPOSSIBLE:
+			return "Impossible difficulty terrain";
 		default:
-			return "Empty";
+			return "Unknown type";
 	}
 };
 
 export function GridIn2D({
 	grid,
 	updateCell,
+	visitedCells,
 	finalPath,
 	isRunning,
 }: {
 	grid: Accessor<Grid>;
+	visitedCells: Accessor<Position[]>;
 	updateCell: (row: number, col: number) => void;
 	finalPath: Accessor<Position[]>;
 	isRunning: Accessor<boolean>;
@@ -61,7 +78,6 @@ export function GridIn2D({
 			style={{
 				"grid-template-rows": `repeat(${rows()}, 1fr)`,
 				"grid-template-columns": `repeat(${cols()}, 1fr)`,
-				"aspect-ratio": `${cols()} / ${rows()}`,
 			}}
 		>
 			<Index each={grid()}>
@@ -72,7 +88,13 @@ export function GridIn2D({
 								type="button"
 								class={cn(
 									"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 md:min-w-6 md:min-h-6 tooltip",
-									getCellColor(cell, rowsIndex, colIndex, finalPath),
+									getCellColor(
+										cell,
+										rowsIndex,
+										colIndex,
+										finalPath,
+										visitedCells,
+									),
 									isRunning()
 										? "transition-colors duration-500 ease-in-out"
 										: "",
@@ -86,7 +108,13 @@ export function GridIn2D({
 										handleCellInteraction(rowsIndex, colIndex, e);
 									}
 								}}
-								data-tooltip={getBlockTypeString(cell())}
+								data-tooltip={getBlockTypeString(
+									cell,
+									rowsIndex,
+									colIndex,
+									finalPath,
+									visitedCells,
+								)}
 							>
 								<CellContent
 									cellValue={cell}

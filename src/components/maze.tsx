@@ -1,6 +1,7 @@
 import { cn } from "~/libs/cn";
 import {
 	AlgorithmAborted,
+	BlockType,
 	type AlgorithmProps,
 	type Grid,
 	type Position,
@@ -10,6 +11,7 @@ import { useSettingsStore } from "~/stores/settings-store";
 import {
 	type Accessor,
 	createEffect,
+	createMemo,
 	createSignal,
 	type JSX,
 	startTransition,
@@ -37,11 +39,22 @@ export interface MazeHandle {
 }
 
 export function Maze(props: GenericMazeProps) {
-	const [grid, setGrid] = createSignal<Grid>(props.sharedGrid());
 	const [visitedOrder, setVisitedOrder] = createSignal<Position[]>([]);
 	const [isRunning, setIsRunning] = createSignal(false);
 	const [finalPath, setFinalPath] = createSignal<Position[]>([]);
 	const finalPathFound = () => finalPath().length > 0;
+	const finalPathCost = () =>
+		createMemo(() => {
+			if (!finalPathFound) return "0";
+			return finalPath()
+				.reduce((acc, cell) => {
+					const cellValue = props.sharedGrid()[cell[0]][cell[1]];
+					return cellValue !== BlockType.START && cellValue !== BlockType.GOAL
+						? acc + cellValue - BlockType.TERRAIN_EASY + 1
+						: acc;
+				}, 0)
+				.toString();
+		});
 	const { state } = useSettingsStore();
 
 	const movesPerSecondRef = { current: null } as { current: number | null };
@@ -53,27 +66,26 @@ export function Maze(props: GenericMazeProps) {
 		movesPerSecondRef.current = state.movesPerSecond;
 	});
 
-	const initializeGrid = (grid: Grid) => {
-		setGrid(grid.map((row) => [...row]));
+	createEffect(() => {
+		props.sharedGrid();
+		resetMaze();
+		setFinalPath([]);
+	});
+
+	const resetMaze = () => {
 		setVisitedOrder([]);
 		setFinalPath([]);
 	};
 
-	createEffect(() => {
-		initializeGrid(props.sharedGrid());
-	});
-
-	const updateCell = async (x: number, y: number, value: number) => {
+	const markCellAsVisited = async (row: number, col: number) => {
 		if (abortControllerRef.current?.signal.aborted) {
 			throw new AlgorithmAborted("Algorithm aborted");
 		}
 		startTransition(() => {
-			setGrid((prev) => {
-				const newGrid = [...prev.map((row) => [...row])];
-				if (newGrid[x][y] === 0) newGrid[x][y] = value;
-				return newGrid;
-			});
-			setVisitedOrder((prev) => [...prev, [x, y]]);
+			const cell = props.sharedGrid()[row][col];
+			if (cell !== BlockType.START && cell !== BlockType.GOAL) {
+				setVisitedOrder((prev) => [...prev, [row, col]]);
+			}
 		});
 
 		if (movesPerSecondRef.current !== maxMovePerSecond) {
@@ -87,7 +99,7 @@ export function Maze(props: GenericMazeProps) {
 		const start = props.startPoint();
 		const goal = props.goalPoint();
 		if (!start || !goal) return;
-		if (finalPathFound()) initializeGrid(props.sharedGrid());
+		if (finalPathFound()) resetMaze();
 		setIsRunning(true);
 		abortControllerRef.current = new AbortController();
 		const rows = props.sharedGrid().length!;
@@ -99,8 +111,8 @@ export function Maze(props: GenericMazeProps) {
 				goal,
 				rows,
 				cols,
-				grid: grid(),
-				updateCell,
+				grid: props.sharedGrid(),
+				markCellAsVisited,
 			});
 
 			if (result) {
@@ -118,7 +130,7 @@ export function Maze(props: GenericMazeProps) {
 
 	const restartAlgorithm = () => {
 		abortControllerRef.current?.abort();
-		initializeGrid(props.sharedGrid());
+		resetMaze();
 	};
 
 	createEffect(() => {
@@ -133,13 +145,13 @@ export function Maze(props: GenericMazeProps) {
 
 	return (
 		<div class="lg:p-4 flex flex-col gap-2 border rounded min-w-96">
-			<header class="flex justify-between md:min-h-16 gap-2 lg:gap-4">
-				<h1 class="md:text-lg text-pretty w-80">
+			<header class="flex justify-between md:min-h-16 gap-2 lg:gap-4 @container">
+				<h1 class="md:text-lg text-pretty w-80 @md:w-fit">
 					Algorithm: {props.algorithmName}
 				</h1>
 				<div class="space-x-2 shrink-0">
 					<GraphView
-						grid={grid}
+						grid={props.sharedGrid}
 						startPoint={props.startPoint}
 						updateCell={props.updateSharedGridCell}
 					/>
@@ -147,7 +159,8 @@ export function Maze(props: GenericMazeProps) {
 				</div>
 			</header>
 			<GridIn2D
-				grid={grid}
+				grid={props.sharedGrid}
+				visitedCells={visitedOrder}
 				finalPath={finalPath}
 				updateCell={props.updateSharedGridCell}
 				isRunning={isRunning}
@@ -162,7 +175,10 @@ export function Maze(props: GenericMazeProps) {
 					)}
 				>
 					<p>Goal reached!</p>
-					<p>Final path takes {finalPath().length - 1} steps.</p>
+					<p class="break-words text-pretty">
+						Final path takes {finalPath().length - 2} steps and the cost is{" "}
+						{finalPathCost()}.
+					</p>
 					<p class="break-words text-pretty">
 						Algorithm visited {visitedOrder().length} cells in the precess of
 						finding the goal.

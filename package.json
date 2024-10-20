@@ -10,6 +10,7 @@
     "@kobalte/core": "^0.13.7",
     "@solidjs/router": "^0.14.10",
     "@solidjs/start": "^1.0.9",
+    "@tailwindcss/container-queries": "^0.1.1",
     "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

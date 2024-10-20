@@ -23,6 +23,7 @@ import { useSettingsStore } from "~/stores/settings-store";
 import type { Algo, BoardSize } from "~/libs/types";
 import type { DialogTriggerProps } from "@kobalte/core/dialog";
 import {
+    algoTypeToFunc,
 	algoTypeToTitle,
 	boardSizes,
 	maxMovePerSecond,
@@ -180,7 +181,7 @@ function MovesPerSecondMenuItem() {
 
 function AddAlgorithmSubMenu() {
 	const { addMaze } = useSettingsStore();
-	const algos = ["Astar", "DFS", "BFS", "BI"] satisfies Algo[];
+	const algos = Object.keys(algoTypeToFunc) as Algo[];
 
 	return (
 		<DropdownMenuSub>

@@ -13,7 +13,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        mono: ['Roboto Mono', 'monospace'],
+        mono: ["Roboto Mono", "monospace"],
       },
       colors: {
         primaryText: "#020617",
@@ -76,12 +76,12 @@ module.exports = {
         },
         "caret-blink": {
           "0%,70%,100%": { opacity: "1" },
-          "20%,50%": { opacity: "0" }
+          "20%,50%": { opacity: "0" },
         },
-				"grow-shrink": {
-					"0%, 100%": { transform: "scale(1)" },
-					"50%": { transform: "scale(1.2)" },
-				},
+        "grow-shrink": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.2)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -89,12 +89,15 @@ module.exports = {
         "collapsible-down": "collapsible-down 0.2s ease-out",
         "collapsible-up": "collapsible-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
-				"grow-shrink": "grow-shrink 2s ease-in-out infinite",
+        "grow-shrink": "grow-shrink 2s ease-in-out infinite",
       },
-			screens: {
-				highres: "3000px",
-			},
+      screens: {
+        highres: "3000px",
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@tailwindcss/container-queries"),
+  ],
 };

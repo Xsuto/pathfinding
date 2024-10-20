@@ -19,7 +19,7 @@ interface SettingsState {
 const [store, setStore] = createStore<SettingsState>({
 	savedBoards: [],
 	movesPerSecond: Math.max(minMovePerSecond, Math.ceil(maxMovePerSecond / 4)),
-	paintMode: BlockType.WALL,
+	paintMode: BlockType.TERRAIN_IMPOSSIBLE,
 	mazes: [
 		{
 			type: "Astar",

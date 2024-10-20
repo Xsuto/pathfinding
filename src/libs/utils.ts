@@ -1,4 +1,4 @@
-import { aStar, bfs, bidirectionalSearch, dfs } from "./algos";
+import { aStar, bfs, bidirectionalSearch, dfs, dijkstra } from "./algos";
 import type { Algo, AlgorithmProps, Grid, Position } from "./types";
 import { BlockType } from "./types";
 
@@ -65,7 +65,7 @@ export function findBlockTypeInGrid(grid: Grid, type: BlockType) {
 }
 
 export function clearGrid(rows: number, cols: number): Grid {
-	return Array(rows).fill(Array(cols).fill(BlockType.EMPTY));
+	return Array(rows).fill(Array(cols).fill(BlockType.TERRAIN_EASY));
 }
 
 export const algoTypeToFunc = {
@@ -73,6 +73,7 @@ export const algoTypeToFunc = {
 	DFS: dfs,
 	BFS: bfs,
 	BI: bidirectionalSearch,
+	Dijkstra: dijkstra,
 } satisfies Record<Algo, (props: AlgorithmProps) => Promise<Position[] | null>>;
 
 export const algoTypeToTitle = {
@@ -80,6 +81,7 @@ export const algoTypeToTitle = {
 	DFS: "Depth first search",
 	Astar: "A* search",
 	BI: "Bidirectional search",
+	Dijkstra: "Dijkstra search",
 } satisfies Record<Algo, string>;
 
 export const boardSizes = [
@@ -100,7 +102,7 @@ export const boardSizes = [
 	},
 	{
 		type: "Giant",
-		rows: 30,
-		cols: 70,
+		rows: 25,
+		cols: 75,
 	},
 ] as const;
