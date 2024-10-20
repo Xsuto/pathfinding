@@ -112,7 +112,7 @@ function MovesPerSecondMenuItem() {
 }
 
 function AddAlgorithmSubMenu() {
-	const { addMaze } = useSettingsStore();
+	const { addAlgorithm } = useUrlState();
 	const algos = Object.keys(algoTypeToFunc) as Algo[];
 
 	return (
@@ -123,7 +123,7 @@ function AddAlgorithmSubMenu() {
 			<DropdownMenuSubContent>
 				<For each={algos}>
 					{(algo) => (
-						<DropdownMenuItem onSelect={() => addMaze(algo)}>
+						<DropdownMenuItem onSelect={() => addAlgorithm(algo)}>
 							<span>{algoTypeToTitle[algo]}</span>
 						</DropdownMenuItem>
 					)}

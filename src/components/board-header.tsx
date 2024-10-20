@@ -14,6 +14,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "~/components/ui/select";
+import { AlgorithmsDialog } from "./algorithms-dialog";
 
 export function BoardHeader() {
 	const { updateGrid, updateBoardSize } = useUrlState();
@@ -41,6 +42,7 @@ export function BoardHeader() {
 
 	return (
 		<header class="flex justify-end gap-2 md:gap-4 py-4 sticky">
+			<AlgorithmsDialog />
 			<Select
 				class="w-52"
 				value={paintModes.find((it) => it.type === state.paintMode)}

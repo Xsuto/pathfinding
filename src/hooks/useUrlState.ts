@@ -1,6 +1,6 @@
 import { useSearchParams } from "@solidjs/router";
 import { createMemo } from "solid-js";
-import type { BoardSize, Grid } from "~/libs/types";
+import type { Algo, BoardSize, Grid } from "~/libs/types";
 import { boardSizes, clearGrid, encodeGrid } from "~/libs/utils";
 import { decodeGrid } from "~/libs/utils";
 
@@ -18,6 +18,16 @@ export function useUrlState() {
 			boardSizes.find((it) => it.type === searchParams.boardSizeType) ??
 			boardSizes.find((it) => it.type === "Medium")!
 		);
+	}, [searchParams]);
+
+	const algorithms = createMemo(() => {
+		const algorithms = searchParams.algorithms
+			? (searchParams.algorithms as string).split("-")
+			: ["Astar"];
+		return algorithms.map((it) => ({
+			type: it as Algo,
+			id: crypto.randomUUID(),
+		}));
 	}, [searchParams]);
 
 	const grid = createMemo(() => {
@@ -40,10 +50,30 @@ export function useUrlState() {
 		setSearchParams({ ...searchParams, grid: encodeGrid(grid) });
 	}
 
+	function addAlgorithm(type: Algo) {
+		setSearchParams({
+			...searchParams,
+			algorithms: [...algorithms().map((it) => it.type), type].join("-"),
+		});
+	}
+
+	function removeAlgorithm(id: string) {
+		setSearchParams({
+			...searchParams,
+			algorithms: algorithms()
+				.filter((it) => it.id !== id)
+				.map((it) => it.type)
+				.join("-"),
+		});
+	}
+
 	return {
 		grid,
 		updateGrid,
 		boardSize,
 		updateBoardSize,
+		algorithms,
+		addAlgorithm,
+		removeAlgorithm,
 	};
 }

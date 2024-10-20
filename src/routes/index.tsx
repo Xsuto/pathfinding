@@ -14,8 +14,9 @@ import { BoardHeader } from "~/components/board-header";
 import { BoardFooter } from "~/components/board-footer";
 
 export default function Home() {
-	const { grid, updateGrid, boardSize } = useUrlState();
-	const { state, removeMaze } = useSettingsStore();
+	const { grid, updateGrid, boardSize, algorithms, removeAlgorithm } =
+		useUrlState();
+	const { state } = useSettingsStore();
 
 	const startPoint = createMemo<Position | undefined>(() =>
 		findBlockTypeInGrid(grid(), BlockType.START),
@@ -36,7 +37,7 @@ export default function Home() {
 	};
 
 	const mazes = createMemo(() =>
-		state.mazes.map((it) => ({
+		algorithms().map((it) => ({
 			...it,
 			algo: algoTypeToFunc[it.type],
 		})),
@@ -98,7 +99,7 @@ export default function Home() {
 							algorithmName={algoTypeToTitle[maze.type]}
 							startPoint={startPoint}
 							goalPoint={goalPoint}
-							removeMaze={() => removeMaze(maze.id)}
+							removeMaze={() => removeAlgorithm(maze.id)}
 						/>
 					)}
 				</For>
