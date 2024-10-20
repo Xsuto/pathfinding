@@ -2,7 +2,12 @@ import { Header } from "~/components/Header";
 import { SettingsDropDownMenu } from "~/components/settings-dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { ContextMenu, useContextMenu } from "~/components/context-menu";
-import { BlockType, type Position, type Grid, type BoardSize } from "~/libs/types";
+import {
+	BlockType,
+	type Position,
+	type Grid,
+	type BoardSize,
+} from "~/libs/types";
 import {
 	algoTypeToFunc,
 	algoTypeToTitle,
@@ -25,20 +30,9 @@ import { useUrlState } from "~/hooks/useUrlState";
 import { VsDebugRestart, VsRunAll } from "solid-icons/vs";
 import { AiOutlineClear, AiOutlineDelete } from "solid-icons/ai";
 
-function isUrlGridValid(boardSize: BoardSize, grid?: Grid) {
-	return (
-		grid && grid.length === boardSize.rows && grid[0]?.length === boardSize.cols
-	);
-}
-
 export default function Home() {
-	const { gridFromUrl, boardSize, updateBoardSize } = useUrlState();
+	const { grid, updateGrid, boardSize, updateBoardSize } = useUrlState();
 	const { state, saveBoard, removeMaze } = useSettingsStore();
-	const [grid, setGrid] = createSignal<Grid>(
-		isUrlGridValid(boardSize(), gridFromUrl())
-			? gridFromUrl()!
-			: clearGrid(boardSize().rows, boardSize().cols),
-	);
 
 	const startPoint = createMemo<Position | undefined>(() =>
 		findBlockTypeInGrid(grid(), BlockType.START),
@@ -88,13 +82,11 @@ export default function Home() {
 				<header class="flex justify-end py-4 sticky">
 					<SettingsDropDownMenu
 						onSaveBoard={(title) => {
-							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${encodeGrid(grid())}`;
-							saveBoard({ title, url: fullURL });
+							saveBoard({ title, url: window.location.href });
 						}}
 						onShareBoard={() => {
-							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${encodeGrid(grid())}`;
 							try {
-								navigator.clipboard.writeText(fullURL);
+								navigator.clipboard.writeText(window.location.href);
 								toaster.show((props) => (
 									<Toast toastId={props.toastId}>
 										<ToastContent>
@@ -108,7 +100,7 @@ export default function Home() {
 							}
 						}}
 						onBoardSizeChange={(size) => {
-							setGrid(clearGrid(size.rows, size.cols));
+							updateGrid(clearGrid(size.rows, size.cols));
 							updateBoardSize(size);
 						}}
 					/>
@@ -138,23 +130,22 @@ export default function Home() {
 									)
 										return;
 									startTransition(() => {
-										setGrid((prev) =>
-											prev.map((value, i) =>
-												value.map((val, j) => {
-													if (
-														state.paintMode === BlockType.GOAL ||
-														state.paintMode === BlockType.START
-													) {
-														return i === row && j === col
-															? state.paintMode
-															: val === state.paintMode
-																? BlockType.EMPTY
-																: val;
-													}
-													return i === row && j === col ? state.paintMode : val;
-												}),
-											),
+										const newGrid = grid().map((value, i) =>
+											value.map((val, j) => {
+												if (
+													state.paintMode === BlockType.GOAL ||
+													state.paintMode === BlockType.START
+												) {
+													return i === row && j === col
+														? state.paintMode
+														: val === state.paintMode
+															? BlockType.TERRAIN_EASY
+															: val;
+												}
+												return i === row && j === col ? state.paintMode : val;
+											}),
 										);
+										updateGrid(newGrid);
 									});
 								}}
 								algorithm={maze.algo}
@@ -175,7 +166,7 @@ export default function Home() {
 					<Button
 						class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
 						onClick={() =>
-							setGrid(clearGrid(boardSize().rows, boardSize().cols))
+							updateGrid(clearGrid(boardSize().rows, boardSize().cols))
 						}
 						variant="destructive"
 					>
