@@ -25,11 +25,8 @@ const getBlockTypeString = (
 	i: number,
 	j: number,
 	finalPath: () => Grid,
-	visitedCells: () => Position[],
 ): string => {
 	if (finalPath().some(([x, y]) => x === i && y === j)) return "Final path";
-	if (visitedCells().some(([x, y]) => x === i && y === j))
-		return "Visited cell";
 	switch (cellValue()) {
 		case BlockType.START:
 			return "Start";
@@ -113,7 +110,6 @@ export function GridIn2D({
 									rowsIndex,
 									colIndex,
 									finalPath,
-									visitedCells,
 								)}
 							>
 								<CellContent

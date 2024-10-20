@@ -2,17 +2,11 @@ import { Header } from "~/components/Header";
 import { SettingsDropDownMenu } from "~/components/settings-dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { ContextMenu, useContextMenu } from "~/components/context-menu";
-import {
-	BlockType,
-	type Position,
-	type Grid,
-	type BoardSize,
-} from "~/libs/types";
+import { BlockType, type Position } from "~/libs/types";
 import {
 	algoTypeToFunc,
 	algoTypeToTitle,
 	clearGrid,
-	encodeGrid,
 	findBlockTypeInGrid,
 } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";

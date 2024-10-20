@@ -25,7 +25,7 @@ export function useUrlState() {
 		const decodedGrid = grid ? (decodeGrid(grid as string) as Grid) : undefined;
 		return isUrlGridValid(boardSize(), decodedGrid)
 			? decodedGrid!
-			: clearGrid(boardSize().rows, boardSize().cols);
+			: updateGrid(clearGrid(boardSize().rows, boardSize().cols));
 	}, [searchParams]);
 
 	function updateBoardSize(size: BoardSize) {

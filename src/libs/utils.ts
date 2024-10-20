@@ -6,16 +6,18 @@ export const minMovePerSecond = 1;
 export const maxMovePerSecond = 50;
 
 export function encodeGrid(grid: Grid) {
-	return grid
+	const rows = grid.map((row) => row.join(""));
+
+	const withoutEncoding = rows.join("-");
+	const encoded = rows
 		.map((row) => {
-			const str = row.join("");
-			if (!str) return "";
+			if (!row) return "";
 			let result = "";
 			let count = 1;
-			let current = str[0];
+			let current = row[0];
 
-			for (let i = 1; i <= str.length; i++) {
-				if (str[i] === current) {
+			for (let i = 1; i <= row.length; i++) {
+				if (row[i] === current) {
 					count++;
 				} else {
 					if (count > 1) {
@@ -23,34 +25,40 @@ export function encodeGrid(grid: Grid) {
 					} else {
 						result += `${current}v`;
 					}
-					current = str[i];
+					current = row[i];
 					count = 1;
 				}
 			}
 			return result;
 		})
 		.join("-");
+	return withoutEncoding.length > encoded.length ? encoded : withoutEncoding;
 }
 
 export function decodeGrid(grid: string) {
-	return grid.split("-").map((str: string) => {
-		if (!str) return "";
-		let result = "";
+	const hasEncoding = grid.includes("c");
+	return hasEncoding
+		? grid.split("-").map((str: string) => {
+			if (!str) return "";
+			let result = "";
 
-		const parts = str.split("v");
-		for (const part of parts) {
-			if (!part) continue;
+			const parts = str.split("v");
+			for (const part of parts) {
+				if (!part) continue;
 
-			const [count, char] = part.split("c");
-			if (char) {
-				result += char.repeat(Number.parseInt(count));
-			} else {
-				result += part;
+				const [count, char] = part.split("c");
+				if (char) {
+					result += char.repeat(Number.parseInt(count));
+				} else {
+					result += part;
+				}
 			}
-		}
 
-		return result.split("").map(Number) as BlockType[];
-	});
+			return result.split("").map(Number) as BlockType[];
+		})
+		: grid
+			.split("-")
+			.map((str: string) => str.split("").map(Number) as BlockType[]);
 }
 
 export function findBlockTypeInGrid(grid: Grid, type: BlockType) {
