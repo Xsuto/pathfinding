@@ -53,7 +53,7 @@ export const CellContent = ({
 				<BsBricks class="w-full h-full" />
 			</Match>
 			<Match when={finalPath().length > 0 && index() >= 0}>
-				<div class="size-4 animate-grow-shrink text-white">
+				<div class="size-5 animate-grow-shrink text-white">
 					<CustomArrow type={getPathArrow()!} />
 				</div>
 			</Match>

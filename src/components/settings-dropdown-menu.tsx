@@ -28,10 +28,10 @@ import {
 	maxMovePerSecond,
 	minMovePerSecond,
 } from "~/libs/utils";
-import { For, createSignal } from "solid-js";
+import { For, Match, Switch, createSignal } from "solid-js";
 import { useUrlState } from "~/hooks/useUrlState";
-import { BsThreeDots } from 'solid-icons/bs'
-import { AiOutlineDelete } from 'solid-icons/ai'
+import { BsThreeDots } from "solid-icons/bs";
+import { AiOutlineDelete } from "solid-icons/ai";
 
 export function SettingsDropDownMenu({
 	onBoardSizeChange,
@@ -77,7 +77,7 @@ function SaveBoardMenuItem({
 		<Dialog open={dialogOpen()} onOpenChange={setDialogOpen}>
 			<DialogTrigger
 				as={(props: DialogTriggerProps) => (
-					<DropdownMenuItem onSelect={(e) => e.preventDefault()} {...props}>
+					<DropdownMenuItem closeOnSelect={false} {...props}>
 						Save board
 					</DropdownMenuItem>
 				)}
@@ -127,11 +127,7 @@ function SavedBoardsSubMenu() {
 				{state.savedBoards.length > 0 ? (
 					<For each={state.savedBoards}>
 						{(board) => (
-							<DropdownMenuItem
-								key={board.id}
-								class="flex gap-2"
-								onSelect={(e) => e.preventDefault()}
-							>
+							<DropdownMenuItem class="flex gap-2" closeOnSelect={false}>
 								<button
 									class="flex-1 text-start"
 									type="button"
@@ -163,9 +159,9 @@ function SavedBoardsSubMenu() {
 function MovesPerSecondMenuItem() {
 	const { state, updateMovesPerSecond } = useSettingsStore();
 	return (
-		<DropdownMenuItem class="flex flex-col gap-2">
+		<DropdownMenuItem class="flex flex-col gap-2" closeOnSelect={false}>
 			<span class="w-full">
-				{`Speed: ${minMovePerSecond === state.movesPerSecond ? "Slowest" : state.movesPerSecond <= 6 ? "Slow" : state.movesPerSecond <= 12 ? "Normal" : state.movesPerSecond === maxMovePerSecond ? "Instant (No animation)" : "Fast"}`}
+				{`Speed: ${minMovePerSecond === state.movesPerSecond ? "Slowest" : state.movesPerSecond < maxMovePerSecond / 4 ? "Slow" : state.movesPerSecond < maxMovePerSecond / 2 ? "Normal" : state.movesPerSecond === maxMovePerSecond ? "Instant (No animation)" : "Fast"}`}
 			</span>
 			<input
 				type="range"

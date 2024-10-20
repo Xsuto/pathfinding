@@ -3,7 +3,55 @@ import type { Algo, AlgorithmProps, Grid, Position } from "./types";
 import { BlockType } from "./types";
 
 export const minMovePerSecond = 1;
-export const maxMovePerSecond = 100;
+export const maxMovePerSecond = 50;
+
+export function encodeGrid(grid: Grid) {
+	return grid
+		.map((row) => {
+			const str = row.join("");
+			if (!str) return "";
+			let result = "";
+			let count = 1;
+			let current = str[0];
+
+			for (let i = 1; i <= str.length; i++) {
+				if (str[i] === current) {
+					count++;
+				} else {
+					if (count > 1) {
+						result += `${count}c${current}v`;
+					} else {
+						result += `${current}v`;
+					}
+					current = str[i];
+					count = 1;
+				}
+			}
+			return result;
+		})
+		.join("-");
+}
+
+export function decodeGrid(grid: string) {
+	return grid.split("-").map((str: string) => {
+		if (!str) return "";
+		let result = "";
+
+		const parts = str.split("v");
+		for (const part of parts) {
+			if (!part) continue;
+
+			const [count, char] = part.split("c");
+			if (char) {
+				result += char.repeat(Number.parseInt(count));
+			} else {
+				result += part;
+			}
+		}
+
+		return result.split("").map(Number) as BlockType[];
+	});
+}
 
 export function findBlockTypeInGrid(grid: Grid, type: BlockType) {
 	for (let i = 0; i < grid.length; i++) {
@@ -16,7 +64,7 @@ export function findBlockTypeInGrid(grid: Grid, type: BlockType) {
 	return undefined;
 }
 
-export function clearGrid(rows: number, cols: number) {
+export function clearGrid(rows: number, cols: number): Grid {
 	return Array(rows).fill(Array(cols).fill(BlockType.EMPTY));
 }
 
@@ -52,7 +100,7 @@ export const boardSizes = [
 	},
 	{
 		type: "Giant",
-		rows: 40,
-		cols: 80,
+		rows: 30,
+		cols: 70,
 	},
 ] as const;

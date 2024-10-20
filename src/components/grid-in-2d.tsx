@@ -1,8 +1,7 @@
 import { useMouseDown } from "~/hooks/useMouseDown";
-import { BlockType, type Grid } from "~/libs/types";
-import type { GridRendererProps } from "./maze";
+import { BlockType, type Position, type Grid } from "~/libs/types";
 import { cn } from "~/libs/cn";
-import { Index, createMemo } from "solid-js";
+import { type Accessor, Index, createMemo } from "solid-js";
 import { CellContent } from "./cell-content";
 
 const getCellColor = (
@@ -38,8 +37,13 @@ export function GridIn2D({
 	grid,
 	updateCell,
 	finalPath,
-	classProp,
-}: GridRendererProps) {
+	isRunning,
+}: {
+	grid: Accessor<Grid>;
+	updateCell: (row: number, col: number) => void;
+	finalPath: Accessor<Position[]>;
+	isRunning: Accessor<boolean>;
+}) {
 	const isMouseDown = useMouseDown();
 	const rows = createMemo(() => grid()?.length);
 	const cols = createMemo(() => grid()?.at(0)?.length ?? 0);
@@ -52,8 +56,7 @@ export function GridIn2D({
 	return (
 		<div
 			class={cn(
-				"grid gap-0 w-auto max-h-full max-w-full overflow-hidden",
-				classProp,
+				"grid gap-0 w-auto max-h-full max-w-full overflow-hidden transition-colors duration-100 ease-in-out",
 			)}
 			style={{
 				"grid-template-rows": `repeat(${rows()}, 1fr)`,
@@ -68,8 +71,11 @@ export function GridIn2D({
 							<button
 								type="button"
 								class={cn(
-									"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 tooltip",
+									"border border-stone-300 flex items-center justify-center hover:brightness-50 text-xs min-h-4 min-w-4 md:min-w-6 md:min-h-6 tooltip",
 									getCellColor(cell, rowsIndex, colIndex, finalPath),
+									isRunning()
+										? "transition-colors duration-500 ease-in-out"
+										: "",
 								)}
 								onClick={() => handleCellInteraction(rowsIndex, colIndex)}
 								onMouseDown={(e) =>

@@ -1,9 +1,8 @@
 import { type Algo, BlockType } from "~/libs/types";
-import { maxMovePerSecond } from "~/libs/utils";
+import { maxMovePerSecond, minMovePerSecond } from "~/libs/utils";
 import { createStore } from "solid-js/store";
 import { createEffect, createSignal, onMount } from "solid-js";
 import { isServer } from "solid-js/web";
-import { useSession } from "vinxi/http";
 
 interface Maze {
 	id: string;
@@ -19,7 +18,7 @@ interface SettingsState {
 
 const [store, setStore] = createStore<SettingsState>({
 	savedBoards: [],
-	movesPerSecond: maxMovePerSecond,
+	movesPerSecond: Math.max(minMovePerSecond, Math.ceil(maxMovePerSecond / 4)),
 	paintMode: BlockType.WALL,
 	mazes: [
 		{
@@ -55,7 +54,7 @@ export function useSettingsStore() {
 	function deleteBoard(id: string) {
 		setStore({
 			...store,
-			savedBoards: store.savedBoards.filter((it) => it.id === id),
+			savedBoards: store.savedBoards.filter((it) => it.id !== id),
 		});
 	}
 

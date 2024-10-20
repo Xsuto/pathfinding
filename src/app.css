@@ -66,6 +66,11 @@
   }
 }
 
+* {
+  font-family: "Roboto Mono", "ui-sans-serif", "system-ui", "sans-serif",
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 .tooltip {
   position: relative;
 }
@@ -99,6 +104,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

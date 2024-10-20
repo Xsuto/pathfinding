@@ -2,20 +2,16 @@ import { Header } from "~/components/Header";
 import { SettingsDropDownMenu } from "~/components/settings-dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { ContextMenu, useContextMenu } from "~/components/context-menu";
-import { BlockType, type Position, type Grid } from "~/libs/types";
+import { BlockType, type Position, type Grid, type BoardSize } from "~/libs/types";
 import {
 	algoTypeToFunc,
 	algoTypeToTitle,
 	clearGrid,
+	encodeGrid,
 	findBlockTypeInGrid,
 } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
-import {
-	For,
-	createMemo,
-	createSignal,
-	startTransition,
-} from "solid-js";
+import { For, createMemo, createSignal, startTransition } from "solid-js";
 import { toaster } from "@kobalte/core";
 import {
 	Toast,
@@ -26,14 +22,22 @@ import {
 import { Footer } from "~/components/Footer";
 import { Maze, type MazeHandle } from "~/components/maze";
 import { useUrlState } from "~/hooks/useUrlState";
-import { VsDebugRestart, VsRunAll } from 'solid-icons/vs'
-import { AiOutlineClear, AiOutlineDelete } from 'solid-icons/ai'
+import { VsDebugRestart, VsRunAll } from "solid-icons/vs";
+import { AiOutlineClear, AiOutlineDelete } from "solid-icons/ai";
+
+function isUrlGridValid(boardSize: BoardSize, grid?: Grid) {
+	return (
+		grid && grid.length === boardSize.rows && grid[0]?.length === boardSize.cols
+	);
+}
 
 export default function Home() {
 	const { gridFromUrl, boardSize, updateBoardSize } = useUrlState();
 	const { state, saveBoard, removeMaze } = useSettingsStore();
 	const [grid, setGrid] = createSignal<Grid>(
-		gridFromUrl() ?? clearGrid(boardSize().rows, boardSize().cols),
+		isUrlGridValid(boardSize(), gridFromUrl())
+			? gridFromUrl()!
+			: clearGrid(boardSize().rows, boardSize().cols),
 	);
 
 	const startPoint = createMemo<Position | undefined>(() =>
@@ -71,28 +75,24 @@ export default function Home() {
 	};
 
 	const resetAllMazes = () => {
-		const promises = Array.from(mazeRefs().values())
-			.filter((maze) => !maze.isRunning)
-			.map((maze) => maze.restart());
+		const promises = Array.from(mazeRefs().values()).map((maze) =>
+			maze.restart(),
+		);
 		return Promise.all(promises);
 	};
 
 	return (
 		<div class="flex flex-col gap-8 relative h-screen w-screen overflow-auto">
 			<Header />
-			<div class="p-4 border rounded-xl border-stone-300 shadow-lg flex flex-col justify-between  relative mx-2 lg:mx-4 flex-grow overflow-hidden">
+			<div class="md:p-4 border rounded-xl border-stone-300 shadow-lg flex flex-col justify-between  relative lg:mx-4 flex-grow overflow-hidden">
 				<header class="flex justify-end py-4 sticky">
 					<SettingsDropDownMenu
 						onSaveBoard={(title) => {
-							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${grid()
-								.map((row) => row.join(""))
-								.join("-")}`;
+							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${encodeGrid(grid())}`;
 							saveBoard({ title, url: fullURL });
 						}}
 						onShareBoard={() => {
-							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${grid()
-								.map((row) => row.join(""))
-								.join("-")}`;
+							const fullURL = `${window.location.protocol}//${window.location.host}${location.pathname}${location.hash}?boardSizeType=${boardSize().type}&grid=${encodeGrid(grid())}`;
 							try {
 								navigator.clipboard.writeText(fullURL);
 								toaster.show((props) => (
@@ -103,7 +103,9 @@ export default function Home() {
 										<ToastProgress />
 									</Toast>
 								));
-							} catch (error) { }
+							} catch (error) {
+								console.error(error);
+							}
 						}}
 						onBoardSizeChange={(size) => {
 							setGrid(clearGrid(size.rows, size.cols));
@@ -113,7 +115,7 @@ export default function Home() {
 				</header>
 				<main
 					onContextMenu={onContextMenu}
-					class="flex flex-wrap overflow-auto contain-content gap-4 relative"
+					class="flex flex-wrap overflow-auto contain-content gap-4 relative justify-center"
 				>
 					<For each={mazes()}>
 						{(maze) => (
@@ -129,7 +131,11 @@ export default function Home() {
 									</Button>
 								}
 								updateSharedGridCell={(row: number, col: number) => {
-									if (mazes().some((maze) => maze.ref?.current?.isRunning))
+									if (
+										Array.from(mazeRefs().values()).some(
+											(maze) => maze.isRunning,
+										)
+									)
 										return;
 									startTransition(() => {
 										setGrid((prev) =>

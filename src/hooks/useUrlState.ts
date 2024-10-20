@@ -1,19 +1,15 @@
 import { useSearchParams } from "@solidjs/router";
 import { createMemo } from "solid-js";
-import type { BlockType, BoardSize } from "~/libs/types";
+import type { BoardSize, Grid } from "~/libs/types";
 import { boardSizes } from "~/libs/utils";
+import { decodeGrid } from "~/libs/utils";
 
 export function useUrlState() {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const gridFromUrl = createMemo(() => {
-		const { grid, ...rest } = searchParams;
-		if (!grid) return undefined;
-		setSearchParams({ ...rest, grid: undefined });
-
-		return grid
-			.split("-")
-			.map((row) => row.split("").map(Number) as BlockType[]);
+		const grid = searchParams.grid;
+		return grid ? decodeGrid(grid as string) as Grid : undefined;
 	}, [searchParams]);
 
 	const boardSize = createMemo(() => {

@@ -19,13 +19,6 @@ import { VsDebugRestart, VsDebugStart } from "solid-icons/vs";
 import { GridIn2D } from "./grid-in-2d";
 import { GraphView } from "./grid-as-graph";
 
-export interface GridRendererProps {
-	grid: Accessor<Grid>;
-	updateCell: (row: number, col: number) => void;
-	finalPath: Accessor<Position[]>;
-	classProp?: string;
-}
-
 interface GenericMazeProps {
 	sharedGrid: Accessor<Grid>;
 	updateSharedGridCell: (row: number, col: number) => void;
@@ -48,7 +41,7 @@ export function Maze(props: GenericMazeProps) {
 	const [visitedOrder, setVisitedOrder] = createSignal<Position[]>([]);
 	const [isRunning, setIsRunning] = createSignal(false);
 	const [finalPath, setFinalPath] = createSignal<Position[]>([]);
-	const pathFound = finalPath()?.length > 0;
+	const finalPathFound = () => finalPath().length > 0;
 	const { state } = useSettingsStore();
 
 	const movesPerSecondRef = { current: null } as { current: number | null };
@@ -94,7 +87,7 @@ export function Maze(props: GenericMazeProps) {
 		const start = props.startPoint();
 		const goal = props.goalPoint();
 		if (!start || !goal) return;
-		if (pathFound) initializeGrid(props.sharedGrid());
+		if (finalPathFound()) initializeGrid(props.sharedGrid());
 		setIsRunning(true);
 		abortControllerRef.current = new AbortController();
 		const rows = props.sharedGrid().length!;
@@ -128,7 +121,6 @@ export function Maze(props: GenericMazeProps) {
 		initializeGrid(props.sharedGrid());
 	};
 
-	// Set up ref handle
 	createEffect(() => {
 		if (props.ref) {
 			props.ref({
@@ -140,9 +132,11 @@ export function Maze(props: GenericMazeProps) {
 	});
 
 	return (
-		<div class="lg:p-4 p-2 flex flex-col h-full gap-2 border rounded flex-1">
+		<div class="lg:p-4 flex flex-col gap-2 border rounded min-w-96">
 			<header class="flex justify-between md:min-h-16 gap-2 lg:gap-4">
-				<h2 class="text-lg text-pretty">Algorithm: {props.algorithmName}</h2>
+				<h1 class="md:text-lg text-pretty w-80">
+					Algorithm: {props.algorithmName}
+				</h1>
 				<div class="space-x-2 shrink-0">
 					<GraphView
 						grid={grid}
@@ -152,34 +146,29 @@ export function Maze(props: GenericMazeProps) {
 					{props.header}
 				</div>
 			</header>
-			<main class="mb-4 flex-grow overflow-auto">
-				<GridIn2D
-					grid={grid}
-					finalPath={finalPath}
-					updateCell={props.updateSharedGridCell}
-					classProp={cn(
-						isRunning() ? "transition-colors duration-500 ease-in-out" : "",
+			<GridIn2D
+				grid={grid}
+				finalPath={finalPath}
+				updateCell={props.updateSharedGridCell}
+				isRunning={isRunning}
+			/>
+			<footer class="flex transition-all duration-300 ease-in-out relative mt-4 justify-between">
+				<div
+					class={cn(
+						"mt-2 font-normal w-96 break-words text-pretty transition-opacity ease-in-out",
+						finalPathFound()
+							? "opacity-100 duration-300"
+							: "opacity-0 duration-0",
 					)}
-				/>
-			</main>
-			<footer
-				class={cn("grid transition-all duration-300 ease-in-out relative")}
-			>
-				<div class="overflow-hidden w-3/4 relative">
-					<div
-						class={cn(
-							"transition-all duration-300 ease-in-out",
-							pathFound ? "h-20 opacity-100" : "h-0 opacity-0",
-						)}
-					>
-						<p class="mt-2 font-normal w-full break-words text-pretty">
-							{finalPath().length > 0
-								? `Goal reached! Final path takes ${finalPath().length - 1} steps. Algorithm visited ${visitedOrder().length} cells in the precess of finding the goal.`
-								: null}
-						</p>
-					</div>
+				>
+					<p>Goal reached!</p>
+					<p>Final path takes {finalPath().length - 1} steps.</p>
+					<p class="break-words text-pretty">
+						Algorithm visited {visitedOrder().length} cells in the precess of
+						finding the goal.
+					</p>
 				</div>
-				<div class="flex justify-end gap-2 p-4">
+				<div class="flex mt-auto gap-2">
 					<Button
 						onClick={startAlgorithm}
 						type="button"

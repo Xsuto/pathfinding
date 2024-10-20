@@ -1,4 +1,4 @@
-import type { AlgorithmProps, Position } from "~/libs/types";
+import { BlockType, type AlgorithmProps, type Position } from "~/libs/types";
 
 const isValid = (
 	x: number,
@@ -7,7 +7,7 @@ const isValid = (
 	cols: number,
 	grid: number[][],
 ) => {
-	return x >= 0 && x < rows && y >= 0 && y < cols && grid[x][y] !== 4;
+	return x >= 0 && x < rows && y >= 0 && y < cols && grid[x][y] !== BlockType.WALL;
 };
 
 export const dfs = async ({
