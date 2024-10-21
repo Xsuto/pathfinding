@@ -20,6 +20,7 @@ import { VsDebugRestart, VsDebugStart } from "solid-icons/vs";
 import { GridIn2D } from "./grid-in-2d";
 import { GraphView } from "./grid-as-graph";
 import { AiOutlineDelete } from "solid-icons/ai";
+import { showGenericToast } from "./generic-toast";
 
 interface GenericMazeProps {
 	sharedGrid: Accessor<Grid>;
@@ -99,7 +100,12 @@ export function Maze(props: GenericMazeProps) {
 	const startAlgorithm = async () => {
 		const start = props.startPoint();
 		const goal = props.goalPoint();
-		if (!start || !goal) return;
+		if (!start) {
+			return showGenericToast("Cannot start, the start point is missing", "destructive")
+		}
+		if (!goal) {
+			return showGenericToast("Cannot start, the goal point is missing", "destructive")
+		}
 		if (finalPathFound()) resetMaze();
 		setIsRunning(true);
 		abortControllerRef.current = new AbortController();
@@ -189,9 +195,10 @@ export function Maze(props: GenericMazeProps) {
 				</div>
 				<div class="flex mt-auto gap-2">
 					<Button
+						classList={{ "opacity-75": !props.goalPoint() || !props.startPoint()}}
 						onClick={startAlgorithm}
 						type="button"
-						disabled={!props.startPoint() || !props.goalPoint() || isRunning()}
+						disabled={isRunning()}
 						variant={isRunning() ? "destructive" : "successful"}
 					>
 						<VsDebugStart />

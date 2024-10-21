@@ -1,12 +1,10 @@
 import { useUrlState } from "~/hooks/useUrlState";
 import { useSettingsStore } from "~/stores/settings-store";
-import { Toast, ToastContent, ToastProgress, ToastTitle } from "./ui/toast";
 import { SaveBoardDialog } from "./save-board-dialog";
 import { Button } from "./ui/button";
 import { FiShare } from "solid-icons/fi";
 import { SettingsDropDownMenu } from "./settings-dropdown-menu";
 import { clearGrid, paintModes } from "~/libs/utils";
-import { toaster } from "@kobalte/core";
 import {
 	Select,
 	SelectContent,
@@ -15,6 +13,7 @@ import {
 	SelectValue,
 } from "~/components/ui/select";
 import { AlgorithmsDialog } from "./algorithms-dialog";
+import { showGenericToast } from "./generic-toast";
 
 export function BoardHeader({ isBoardRunning }: { isBoardRunning: () => boolean }) {
 	const { updateGrid, updateBoardSize } = useUrlState();
@@ -27,14 +26,7 @@ export function BoardHeader({ isBoardRunning }: { isBoardRunning: () => boolean 
 	const onShareBoard = () => {
 		try {
 			navigator.clipboard.writeText(window.location.href);
-			toaster.show((props) => (
-				<Toast toastId={props.toastId}>
-					<ToastContent>
-						<ToastTitle>Url saved to Clipboard</ToastTitle>
-					</ToastContent>
-					<ToastProgress />
-				</Toast>
-			));
+			showGenericToast("Url saved to clipboard")
 		} catch (error) {
 			console.error(error);
 		}

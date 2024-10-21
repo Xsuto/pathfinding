@@ -1,15 +1,19 @@
 import { VsDebugRestart, VsRunAll } from "solid-icons/vs";
 import { Button } from "./ui/button";
 import { AiOutlineClear } from "solid-icons/ai";
+import { cn } from "~/libs/cn";
+import { showGenericToast } from "./generic-toast";
 
 export function BoardFooter({
 	clearGrid,
 	runAllMazes,
 	resetAllMazes,
-	canStartMazes,
+	hasStartPoint,
+	hasGoalPoint
 }: {
 	clearGrid: () => void;
-	canStartMazes: () => boolean;
+	hasStartPoint: () => boolean;
+	hasGoalPoint: () => boolean;
 	runAllMazes: () => void;
 	resetAllMazes: () => void;
 }) {
@@ -32,9 +36,16 @@ export function BoardFooter({
 				<span class="hidden md:block">Reset all</span>
 			</Button>
 			<Button
-				class="rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40"
-				onClick={runAllMazes}
-				disabled={!canStartMazes()}
+				class={cn("rounded-md flex flex-row items-center gap-2 justify-center py-5 w-40", !(hasStartPoint() || hasGoalPoint()) && "opacity-75")}
+				onClick={() => {
+					if (!hasStartPoint()) {
+						return showGenericToast("Cannot start, the start point is missing", "destructive")
+					}
+					if (!hasGoalPoint()) {
+						return showGenericToast("Cannot start, the goal point is missing", "destructive")
+					}
+					runAllMazes()
+				}}
 				variant="successful"
 			>
 				<VsRunAll />

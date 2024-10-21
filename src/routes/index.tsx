@@ -115,7 +115,8 @@ export default function Home() {
 				onContextMenu={onContextMenu}
 			/>
 			<BoardFooter
-				canStartMazes={() => !!startPoint() && !!goalPoint()}
+				hasStartPoint={() => !!startPoint()}
+				hasGoalPoint={() =>  !!goalPoint()}
 				runAllMazes={runAllMazes}
 				resetAllMazes={resetAllMazes}
 				clearGrid={() =>
