@@ -29,7 +29,7 @@ export function SettingsDropDownMenu({
 			<DropdownMenuTrigger>
 				<BsThreeDots />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent class="min-w-64">
+			<DropdownMenuContent class="min-w-32 lg:min-w-64">
 				<DropdownMenuGroup>
 					<DropdownMenuGroupLabel>Settings</DropdownMenuGroupLabel>
 					<DropdownMenuSeparator />

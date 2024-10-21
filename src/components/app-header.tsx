@@ -7,7 +7,7 @@ function LogoIcon() {
 			width="1em"
 			height="1em"
 			viewBox="0 0 16 16"
-			class="size-6"
+			class="size-6 hidden md:block"
 		>
 			<path
 				fill="none"
@@ -25,7 +25,7 @@ export function AppHeader() {
 				<LogoIcon />
 				<span class="text-lg font-semibold">Pathfinding Visualizer</span>
 			</h1>
-			<nav class="flex items-center gap-4" >
+			<nav class="flex items-center gap-4">
 				<AboutDialog />
 			</nav>
 		</header>

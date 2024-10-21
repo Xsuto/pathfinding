@@ -15,7 +15,9 @@ import {
 import { AlgorithmsDialog } from "./algorithms-dialog";
 import { showGenericToast } from "./generic-toast";
 
-export function BoardHeader({ isBoardRunning }: { isBoardRunning: () => boolean }) {
+export function BoardHeader({
+	isBoardRunning,
+}: { isBoardRunning: () => boolean }) {
 	const { updateGrid, updateBoardSize } = useUrlState();
 	const { state, saveBoard, updatePaintMode } = useSettingsStore();
 
@@ -26,7 +28,7 @@ export function BoardHeader({ isBoardRunning }: { isBoardRunning: () => boolean 
 	const onShareBoard = () => {
 		try {
 			navigator.clipboard.writeText(window.location.href);
-			showGenericToast("Url saved to clipboard")
+			showGenericToast("Url saved to clipboard");
 		} catch (error) {
 			console.error(error);
 		}
@@ -61,7 +63,7 @@ export function BoardHeader({ isBoardRunning }: { isBoardRunning: () => boolean 
 
 			<SettingsDropDownMenu
 				onBoardSizeChange={(size) => {
-					if (isBoardRunning()) return
+					if (isBoardRunning()) return;
 					updateGrid(clearGrid(size.rows, size.cols));
 					updateBoardSize(size);
 				}}
