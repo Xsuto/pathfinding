@@ -24,6 +24,7 @@ import {
 	AiOutlineDelete,
 } from "solid-icons/ai";
 import type { Algo } from "~/libs/types";
+import { createAutoAnimateDirective } from "@formkit/auto-animate/solid";
 
 function AlgorithmIcon() {
 	return (
@@ -51,6 +52,8 @@ function AlgorithmIcon() {
 export function AlgorithmsDialog() {
 	const { algorithms, removeAlgorithm, addAlgorithm, setAlgorithms } =
 		useUrlState();
+	const autoAnimate = createAutoAnimateDirective()
+
 	return (
 		<Dialog>
 			<DialogTrigger
@@ -88,14 +91,17 @@ export function AlgorithmsDialog() {
 							<SelectContent />
 						</Select>
 					</div>
-					<div class="space-y-2">
+					<div
+						class="space-y-2 parent"
+						use:autoAnimate
+					>
 						<For each={algorithms()}>
-							{(algorithm) => {
+							{(algorithm, index) => {
 								return (
 									<div class="flex items-center justify-between bg-secondary p-3 rounded-md">
 										<div>
 											<h3 class="font-semibold">
-												{algoTypeToTitle[algorithm.type]}
+												{algoTypeToTitle[algorithm]}
 											</h3>
 										</div>
 										<div class="space-x-2">
@@ -103,16 +109,14 @@ export function AlgorithmsDialog() {
 												variant="outline"
 												size="icon"
 												onClick={() => {
-													const idx = algorithms().findIndex(
-														(it) => it.id === algorithm.id,
-													);
+													const idx = index();
 													if (idx <= 0) return;
 													const newOrder = algorithms();
 													[newOrder[idx], newOrder[idx - 1]] = [
 														newOrder[idx - 1],
 														newOrder[idx],
 													];
-													setAlgorithms(newOrder.map((it) => it.type));
+													setAlgorithms([...newOrder] as Algo[]);
 												}}
 											>
 												<AiOutlineArrowUp />
@@ -121,16 +125,14 @@ export function AlgorithmsDialog() {
 												variant="outline"
 												size="icon"
 												onClick={() => {
-													const idx = algorithms().findIndex(
-														(it) => it.id === algorithm.id,
-													);
+													const idx = index();
 													if (idx === algorithms().length - 1) return;
 													const newOrder = algorithms();
 													[newOrder[idx], newOrder[idx + 1]] = [
 														newOrder[idx + 1],
 														newOrder[idx],
 													];
-													setAlgorithms(newOrder.map((it) => it.type));
+													setAlgorithms([...newOrder] as Algo[]);
 												}}
 											>
 												<AiOutlineArrowDown />
@@ -139,7 +141,7 @@ export function AlgorithmsDialog() {
 												variant="outline"
 												size="icon"
 												onClick={() => {
-													removeAlgorithm(algorithm.id);
+													removeAlgorithm(index());
 												}}
 											>
 												<AiOutlineDelete />

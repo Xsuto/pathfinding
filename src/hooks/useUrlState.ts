@@ -22,12 +22,9 @@ export function useUrlState() {
 
 	const algorithms = createMemo(() => {
 		const algorithms = searchParams.algorithms
-			? (searchParams.algorithms as string).split("-")
-			: ["Astar"];
-		return algorithms.map((it) => ({
-			type: it as Algo,
-			id: crypto.randomUUID(),
-		}));
+			? ((searchParams.algorithms as string).split("-") as Algo[])
+			: ["Astar"] as Algo[];
+		return algorithms;
 	}, [searchParams]);
 
 	const grid = createMemo(() => {
@@ -53,7 +50,7 @@ export function useUrlState() {
 	function addAlgorithm(type: Algo) {
 		setSearchParams({
 			...searchParams,
-			algorithms: [...algorithms().map((it) => it.type), type].join("-"),
+			algorithms: [...algorithms(), type].join("-"),
 		});
 	}
 
@@ -64,13 +61,13 @@ export function useUrlState() {
 		});
 	}
 
-	function removeAlgorithm(id: string) {
+	function removeAlgorithm(index: number) {
 		setSearchParams({
 			...searchParams,
-			algorithms: algorithms()
-				.filter((it) => it.id !== id)
-				.map((it) => it.type)
-				.join("-"),
+			algorithms: [
+				...algorithms().slice(0, index),
+				...algorithms().slice(index + 1),
+			].join("-"),
 		});
 	}
 

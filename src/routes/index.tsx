@@ -12,11 +12,13 @@ import { Maze, type MazeHandle } from "~/components/maze";
 import { useUrlState } from "~/hooks/useUrlState";
 import { BoardHeader } from "~/components/board-header";
 import { BoardFooter } from "~/components/board-footer";
+import { createAutoAnimate } from "@formkit/auto-animate/solid";
 
 export default function Home() {
 	const { grid, updateGrid, boardSize, algorithms, removeAlgorithm } =
 		useUrlState();
 	const { state } = useSettingsStore();
+	const [parent] = createAutoAnimate();
 
 	const startPoint = createMemo<Position | undefined>(() =>
 		findBlockTypeInGrid(grid(), BlockType.START),
@@ -26,22 +28,15 @@ export default function Home() {
 		findBlockTypeInGrid(grid(), BlockType.GOAL),
 	);
 
-	const [mazeRefs] = createSignal<Map<string, MazeHandle>>(new Map());
+	const [mazeRefs] = createSignal<Map<number, MazeHandle>>(new Map());
 
-	const setMazeRef = (id: string, handle: MazeHandle | null) => {
+	const setMazeRef = (id: number, handle: MazeHandle | null) => {
 		if (handle) {
 			mazeRefs().set(id, handle);
 		} else {
 			mazeRefs().delete(id);
 		}
 	};
-
-	const mazes = createMemo(() =>
-		algorithms().map((it) => ({
-			...it,
-			algo: algoTypeToFunc[it.type],
-		})),
-	);
 
 	const { onContextMenu, isOpen, onClickOutside, position } = useContextMenu();
 
@@ -69,11 +64,12 @@ export default function Home() {
 			<main
 				onContextMenu={onContextMenu}
 				class="flex flex-wrap overflow-auto contain-content gap-4 relative justify-center"
+				ref={parent}
 			>
-				<For each={mazes()}>
-					{(maze) => (
+				<For each={algorithms()}>
+					{(algorithm, index) => (
 						<Maze
-							ref={(handle) => setMazeRef(maze.id, handle)}
+							ref={(handle) => setMazeRef(index(), handle)}
 							sharedGrid={grid}
 							updateSharedGridCell={(row: number, col: number) => {
 								if (
@@ -99,11 +95,11 @@ export default function Home() {
 									updateGrid(newGrid);
 								});
 							}}
-							algorithm={maze.algo}
-							algorithmName={algoTypeToTitle[maze.type]}
+							algorithm={algoTypeToFunc[algorithm]}
+							algorithmName={algoTypeToTitle[algorithm]}
 							startPoint={startPoint}
 							goalPoint={goalPoint}
-							removeMaze={() => removeAlgorithm(maze.id)}
+							removeMaze={() => removeAlgorithm(index())}
 						/>
 					)}
 				</For>
@@ -116,7 +112,7 @@ export default function Home() {
 			/>
 			<BoardFooter
 				hasStartPoint={() => !!startPoint()}
-				hasGoalPoint={() =>  !!goalPoint()}
+				hasGoalPoint={() => !!goalPoint()}
 				runAllMazes={runAllMazes}
 				resetAllMazes={resetAllMazes}
 				clearGrid={() =>
