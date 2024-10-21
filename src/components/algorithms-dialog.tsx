@@ -24,13 +24,6 @@ import {
 	AiOutlineDelete,
 } from "solid-icons/ai";
 import type { Algo } from "~/libs/types";
-import {
-	DragDropProvider,
-	DragDropSensors,
-	useDragDropContext,
-	createDraggable,
-	createDroppable,
-} from "@thisbeyond/solid-dnd";
 
 function AlgorithmIcon() {
 	return (
@@ -82,7 +75,10 @@ export function AlgorithmsDialog() {
 							onChange={(algo) => algo && addAlgorithm(algo as Algo)}
 							options={Object.keys(algoTypeToTitle)}
 							itemComponent={(props) => (
-								<SelectItem item={props.item}>{algoTypeToTitle[props.item.rawValue as Algo]}</SelectItem>)}
+								<SelectItem item={props.item}>
+									{algoTypeToTitle[props.item.rawValue as Algo]}
+								</SelectItem>
+							)}
 						>
 							<SelectTrigger>
 								<SelectValue<string>>
@@ -101,7 +97,6 @@ export function AlgorithmsDialog() {
 											<h3 class="font-semibold">
 												{algoTypeToTitle[algorithm.type]}
 											</h3>
-											<p class="text-sm text-muted-foreground">TODO</p>
 										</div>
 										<div class="space-x-2">
 											<Button
