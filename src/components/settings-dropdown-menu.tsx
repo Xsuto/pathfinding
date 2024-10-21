@@ -12,14 +12,8 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { useSettingsStore } from "~/stores/settings-store";
-import type { Algo, BoardSize } from "~/libs/types";
-import {
-	algoTypeToFunc,
-	algoTypeToTitle,
-	boardSizes,
-	maxMovePerSecond,
-	minMovePerSecond,
-} from "~/libs/utils";
+import type { BoardSize } from "~/libs/types";
+import { boardSizes, maxMovePerSecond, minMovePerSecond } from "~/libs/utils";
 import { For } from "solid-js";
 import { useUrlState } from "~/hooks/useUrlState";
 import { BsThreeDots } from "solid-icons/bs";
@@ -41,7 +35,6 @@ export function SettingsDropDownMenu({
 					<DropdownMenuSeparator />
 					<MovesPerSecondMenuItem />
 					<SavedBoardsSubMenu />
-					<AddAlgorithmSubMenu />
 					<ChangeBoardSizeSubMenu onChange={onBoardSizeChange} />
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
@@ -108,28 +101,6 @@ function MovesPerSecondMenuItem() {
 				class="w-full"
 			/>
 		</DropdownMenuItem>
-	);
-}
-
-function AddAlgorithmSubMenu() {
-	const { addAlgorithm } = useUrlState();
-	const algos = Object.keys(algoTypeToFunc) as Algo[];
-
-	return (
-		<DropdownMenuSub>
-			<DropdownMenuSubTrigger>
-				<span>Add algorithm</span>
-			</DropdownMenuSubTrigger>
-			<DropdownMenuSubContent>
-				<For each={algos}>
-					{(algo) => (
-						<DropdownMenuItem onSelect={() => addAlgorithm(algo)}>
-							<span>{algoTypeToTitle[algo]}</span>
-						</DropdownMenuItem>
-					)}
-				</For>
-			</DropdownMenuSubContent>
-		</DropdownMenuSub>
 	);
 }
 

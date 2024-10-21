@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/select";
 import { AlgorithmsDialog } from "./algorithms-dialog";
 
-export function BoardHeader() {
+export function BoardHeader({ isBoardRunning }: { isBoardRunning: () => boolean }) {
 	const { updateGrid, updateBoardSize } = useUrlState();
 	const { state, saveBoard, updatePaintMode } = useSettingsStore();
 
@@ -69,6 +69,7 @@ export function BoardHeader() {
 
 			<SettingsDropDownMenu
 				onBoardSizeChange={(size) => {
+					if (isBoardRunning()) return
 					updateGrid(clearGrid(size.rows, size.cols));
 					updateBoardSize(size);
 				}}

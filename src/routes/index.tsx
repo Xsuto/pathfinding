@@ -61,7 +61,11 @@ export default function Home() {
 
 	return (
 		<div class="md:p-4 border rounded-xl border-stone-300 shadow-lg flex flex-col justify-between  relative lg:mx-4 flex-grow overflow-hidden">
-			<BoardHeader />
+			<BoardHeader
+				isBoardRunning={() =>
+					Array.from(mazeRefs().values()).some((maze) => maze.isRunning)
+				}
+			/>
 			<main
 				onContextMenu={onContextMenu}
 				class="flex flex-wrap overflow-auto contain-content gap-4 relative justify-center"

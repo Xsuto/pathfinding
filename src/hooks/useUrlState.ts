@@ -57,6 +57,13 @@ export function useUrlState() {
 		});
 	}
 
+	function setAlgorithms(algos: Algo[]) {
+		setSearchParams({
+			...searchParams,
+			algorithms: algos.join("-"),
+		});
+	}
+
 	function removeAlgorithm(id: string) {
 		setSearchParams({
 			...searchParams,
@@ -73,6 +80,7 @@ export function useUrlState() {
 		boardSize,
 		updateBoardSize,
 		algorithms,
+		setAlgorithms,
 		addAlgorithm,
 		removeAlgorithm,
 	};

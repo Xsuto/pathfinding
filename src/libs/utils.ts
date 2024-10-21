@@ -85,7 +85,7 @@ export const algoTypeToFunc = {
 } satisfies Record<Algo, (props: AlgorithmProps) => Promise<Position[] | null>>;
 
 export const algoTypeToTitle = {
-	BFS: "Breath first search",
+	BFS: "Breadth first search",
 	DFS: "Depth first search",
 	Astar: "A* search",
 	BI: "Bidirectional search",

@@ -1,13 +1,36 @@
 import {
 	Dialog,
 	DialogContent,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	DialogDescription,
 } from "./ui/dialog";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "~/components/ui/select";
 import { Button } from "./ui/button";
 import type { DialogTriggerProps } from "@kobalte/core/dialog";
+import { useUrlState } from "~/hooks/useUrlState";
+import { For } from "solid-js";
+import { algoTypeToTitle } from "~/libs/utils";
+import {
+	AiOutlineArrowDown,
+	AiOutlineArrowUp,
+	AiOutlineDelete,
+} from "solid-icons/ai";
+import type { Algo } from "~/libs/types";
+import {
+	DragDropProvider,
+	DragDropSensors,
+	useDragDropContext,
+	createDraggable,
+	createDroppable,
+} from "@thisbeyond/solid-dnd";
 
 function AlgorithmIcon() {
 	return (
@@ -33,6 +56,8 @@ function AlgorithmIcon() {
 }
 
 export function AlgorithmsDialog() {
+	const { algorithms, removeAlgorithm, addAlgorithm, setAlgorithms } =
+		useUrlState();
 	return (
 		<Dialog>
 			<DialogTrigger
@@ -44,6 +69,93 @@ export function AlgorithmsDialog() {
 				)}
 			/>
 			<DialogContent class="sm:max-w-[425px]">
+				<DialogHeader>
+					<DialogTitle>Algorithms</DialogTitle>
+					<DialogDescription>Add and manage algorithms.</DialogDescription>
+				</DialogHeader>
+				<div class="mt-4 space-y-4">
+					<div class="flex items-center space-x-2">
+						<Select
+							class="w-full"
+							value={null}
+							placeholder="Add algorithm"
+							onChange={(algo) => algo && addAlgorithm(algo as Algo)}
+							options={Object.keys(algoTypeToTitle)}
+							itemComponent={(props) => (
+								<SelectItem item={props.item}>{algoTypeToTitle[props.item.rawValue as Algo]}</SelectItem>)}
+						>
+							<SelectTrigger>
+								<SelectValue<string>>
+									{(state) => state.selectedOption()}
+								</SelectValue>
+							</SelectTrigger>
+							<SelectContent />
+						</Select>
+					</div>
+					<div class="space-y-2">
+						<For each={algorithms()}>
+							{(algorithm) => {
+								return (
+									<div class="flex items-center justify-between bg-secondary p-3 rounded-md">
+										<div>
+											<h3 class="font-semibold">
+												{algoTypeToTitle[algorithm.type]}
+											</h3>
+											<p class="text-sm text-muted-foreground">TODO</p>
+										</div>
+										<div class="space-x-2">
+											<Button
+												variant="outline"
+												size="icon"
+												onClick={() => {
+													const idx = algorithms().findIndex(
+														(it) => it.id === algorithm.id,
+													);
+													if (idx <= 0) return;
+													const newOrder = algorithms();
+													[newOrder[idx], newOrder[idx - 1]] = [
+														newOrder[idx - 1],
+														newOrder[idx],
+													];
+													setAlgorithms(newOrder.map((it) => it.type));
+												}}
+											>
+												<AiOutlineArrowUp />
+											</Button>
+											<Button
+												variant="outline"
+												size="icon"
+												onClick={() => {
+													const idx = algorithms().findIndex(
+														(it) => it.id === algorithm.id,
+													);
+													if (idx === algorithms().length - 1) return;
+													const newOrder = algorithms();
+													[newOrder[idx], newOrder[idx + 1]] = [
+														newOrder[idx + 1],
+														newOrder[idx],
+													];
+													setAlgorithms(newOrder.map((it) => it.type));
+												}}
+											>
+												<AiOutlineArrowDown />
+											</Button>
+											<Button
+												variant="outline"
+												size="icon"
+												onClick={() => {
+													removeAlgorithm(algorithm.id);
+												}}
+											>
+												<AiOutlineDelete />
+											</Button>
+										</div>
+									</div>
+								);
+							}}
+						</For>
+					</div>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);
