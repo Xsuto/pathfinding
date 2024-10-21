@@ -43,18 +43,19 @@ export function Maze(props: GenericMazeProps) {
 	const [isRunning, setIsRunning] = createSignal(false);
 	const [finalPath, setFinalPath] = createSignal<Position[]>([]);
 	const finalPathFound = () => finalPath().length > 0;
-	const finalPathCost = () =>
-		createMemo(() => {
-			if (!finalPathFound) return "0";
-			return finalPath()
-				.reduce((acc, cell) => {
-					const cellValue = props.sharedGrid().at(cell[0])?.at(cell[1]);
-					return cellValue && cellValue !== BlockType.START && cellValue !== BlockType.GOAL
-						? acc + cellValue - BlockType.TERRAIN_EASY + 1
-						: acc;
-				}, 0)
-				.toString();
-		});
+	const finalPathCost = createMemo(() => {
+		if (!finalPathFound) return "0";
+		return finalPath()
+			.reduce((acc, cell) => {
+				const cellValue = props.sharedGrid().at(cell[0])?.at(cell[1]);
+				return cellValue &&
+					cellValue !== BlockType.START &&
+					cellValue !== BlockType.GOAL
+					? acc + cellValue - BlockType.TERRAIN_EASY + 1
+					: acc;
+			}, 0)
+			.toString();
+	});
 	const { state } = useSettingsStore();
 
 	const movesPerSecondRef = { current: null } as { current: number | null };

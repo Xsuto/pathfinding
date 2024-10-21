@@ -1,3 +1,5 @@
+import AboutDialog from "./about-dialog";
+
 function LogoIcon() {
 	return (
 		<svg
@@ -23,7 +25,9 @@ export function AppHeader() {
 				<LogoIcon />
 				<span class="text-lg font-semibold">Pathfinding Visualizer</span>
 			</h1>
-			<nav class="flex items-center gap-4" />
+			<nav class="flex items-center gap-4" >
+				<AboutDialog />
+			</nav>
 		</header>
 	);
 }

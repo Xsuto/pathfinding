@@ -16,7 +16,7 @@ const isValid = (
 	);
 };
 
-const getTerrainCost = (cellValue: BlockType) => {
+export const getTerrainCost = (cellValue: BlockType) => {
 	return cellValue - BlockType.TERRAIN_EASY + 1;
 };
 

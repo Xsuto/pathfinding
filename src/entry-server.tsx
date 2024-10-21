@@ -1,7 +1,5 @@
 // @refresh reload
 import { createHandler, StartServer } from "@solidjs/start/server";
-import { AppHeader } from "~/components/app-header";
-import { AppFooter } from "~/components/app-footer";
 
 export default createHandler(() => (
 	<StartServer
@@ -24,9 +22,7 @@ export default createHandler(() => (
 						id="app"
 						class="flex flex-col gap-8 relative overflow-auto"
 					>
-						<AppHeader />
 						{children}
-						<AppFooter />
 					</div>
 					{scripts}
 				</body>
