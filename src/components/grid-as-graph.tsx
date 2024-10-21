@@ -1,4 +1,10 @@
-import { type Accessor, For, type JSX, createMemo, createSignal } from "solid-js";
+import {
+	type Accessor,
+	For,
+	type JSX,
+	createMemo,
+	createSignal,
+} from "solid-js";
 import { BlockType, type Grid, type Position } from "~/libs/types";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import type { DialogTriggerProps } from "@kobalte/core/dialog";
@@ -111,10 +117,10 @@ const gridToGraph = (
 const calculateGraphDimensions = (
 	root: GraphNode,
 ): { width: number; height: number; minRow: number; minCol: number } => {
-	let minRow = Number.POSITIVE_INFINITY;
-	let maxRow = -Number.NEGATIVE_INFINITY;
-	let minCol = Number.POSITIVE_INFINITY;
-	let maxCol = Number.NEGATIVE_INFINITY;
+	let minRow = Infinity;
+	let maxRow = -Infinity;
+	let minCol = Infinity;
+	let maxCol = -Infinity;
 
 	const queue: GraphNode[] = [root];
 	const visited = new Set<string>();
