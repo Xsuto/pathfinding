@@ -11,10 +11,21 @@ import type { DialogTriggerProps } from "@kobalte/core/dialog";
 import { TbBadge, TbBrain, TbCode,  TbRoute } from "solid-icons/tb";
 import { BlockType } from "~/libs/types";
 import { getTerrainCost } from "~/libs/algos";
+import { createSignal, onMount } from "solid-js";
 
 export default function AboutDialog() {
+  const [open, setOpen] = createSignal(false)
+  onMount(() => {
+    setOpen(!localStorage.getItem("did-see-about-project-dialog"))
+  })
+
   return (
-    <Dialog>
+    <Dialog open={open()} onOpenChange={(state) => {
+      if (!state && !localStorage.getItem("did-see-about-project-dialog")) {
+        localStorage.setItem("did-see-about-project-dialog", "true")
+      }
+      setOpen(state)
+    }}>
       <DialogTrigger
         as={(props: DialogTriggerProps) => (
           <Button variant="outline" class="gap-2 hover:bg-primary/10" {...props}>
