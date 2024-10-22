@@ -27,7 +27,7 @@ export function SettingsDropDownMenu({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger>
-				<BsThreeDots />
+				<BsThreeDots class="size-6" />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent class="min-w-32 lg:min-w-64">
 				<DropdownMenuGroup>

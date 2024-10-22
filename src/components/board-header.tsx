@@ -38,7 +38,7 @@ export function BoardHeader({
 		<header class="flex justify-end gap-2 md:gap-4 py-4 sticky">
 			<AlgorithmsDialog />
 			<Select
-				class="w-52"
+				class="w-44 lg:w-52"
 				value={paintModes.find((it) => it.type === state.paintMode)}
 				options={paintModes}
 				onChange={(e) => e && updatePaintMode(e?.type)}
@@ -49,7 +49,7 @@ export function BoardHeader({
 				)}
 			>
 				<SelectTrigger>
-					<SelectValue<(typeof paintModes)[number]>>
+					<SelectValue<(typeof paintModes)[number]> class="text-xs md:text-sm">
 						{(state) => `Paint: ${state.selectedOption().label}`}
 					</SelectValue>
 				</SelectTrigger>
