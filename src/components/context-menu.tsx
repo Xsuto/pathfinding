@@ -31,6 +31,19 @@ export function useContextMenu() {
   };
 }
 
+const GENERAL_SECTION_ITEMS = [
+  { label: "Start Node", type: BlockType.START },
+  { label: "Goal Node", type: BlockType.GOAL },
+  { label: "Wall", type: BlockType.TERRAIN_IMPOSSIBLE },
+  { label: "Empty", type: BlockType.TERRAIN_EASY },
+];
+
+const TERRAIN_SECTION_ITEMS = [
+  { label: "Easy Path", type: BlockType.TERRAIN_EASY },
+  { label: "Medium Path", type: BlockType.TERRAIN_MEDIUM },
+  { label: "Hard Path", type: BlockType.TERRAIN_HARD },
+];
+
 export function ContextMenu({
   isOpen,
   onClickOutside,
@@ -58,22 +71,56 @@ export function ContextMenu({
             top: `${position().y}px`,
           }}
         >
-          <For each={paintModes}>
-            {(item) => (
-              <button
-                type="button"
-                class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 w-full"
-                onClick={() => {
-                  updatePaintMode(item.type);
-                  onClickOutside();
-                }}
-              >
-                <span>{item.label}</span>
-              </button>
-            )}
-          </For>
+          <div class="pb-2">
+            <div class="px-4 py-1 text-sm font-medium text-gray-500">
+              General
+            </div>
+            <For each={GENERAL_SECTION_ITEMS}>
+              {(item) => (
+                <MenuItem
+                  item={item}
+                  onClick={() => {
+                    updatePaintMode(item.type);
+                    onClickOutside();
+                  }}
+                />
+              )}
+            </For>
+          </div>
+          <div class="border-t border-gray-200 my-1" />
+          <div>
+            <div class="px-4 py-1 text-sm font-medium text-gray-500">
+              Terrain Difficulty
+            </div>
+            <For each={TERRAIN_SECTION_ITEMS}>
+              {(item) => (
+                <MenuItem
+                  item={item}
+                  onClick={() => {
+                    updatePaintMode(item.type);
+                    onClickOutside();
+                  }}
+                />
+              )}
+            </For>
+          </div>
         </div>
       </div>
     </Show>
+  );
+}
+
+function MenuItem({
+  item,
+  onClick,
+}: { item: { label: string; type: BlockType }; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 w-full text-left"
+      onClick={onClick}
+    >
+      <span>{item.label}</span>
+    </button>
   );
 }
