@@ -9,18 +9,12 @@ export default createHandler(() => (
 					<meta charset="utf-8" />
 					<meta name="viewport" content="width=device-width, initial-scale=1" />
 					<title>Pathfinding app</title>
-					<link rel="preconnect" href="https://fonts.googleapis.com" />
-					<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-					<link
-						href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
-						rel="stylesheet"
-					/>
 					{assets}
 				</head>
-				<body class="bg-primaryBackground text-primaryText min-h-screen h-screen w-screen relative font-mono">
+				<body class="bg-primaryBackground text-primaryText min-h-screen h-screen w-screen relative">
 					<div
 						id="app"
-						class="flex flex-col gap-8 relative overflow-auto"
+						class="flex flex-col gap-8 relative overflow-auto font-mono"
 					>
 						{children}
 					</div>

@@ -12,9 +12,6 @@ module.exports = {
       },
     },
     extend: {
-      fontFamily: {
-        mono: ["Roboto Mono", "monospace"],
-      },
       colors: {
         primaryText: "#020617",
         primaryBackground: "#fafafa",
