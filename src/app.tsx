@@ -2,23 +2,28 @@ import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
 import "./app.css";
-import { ToastList, ToastRegion } from "./components/ui/toast";
-import { AppHeader } from "./components/app-header";
+import { MetaProvider } from "@solidjs/meta";
 import { AppFooter } from "./components/app-footer";
+import { AppHeader } from "./components/app-header";
+import { ToastList, ToastRegion } from "./components/ui/toast";
+import { SocialMeta } from "./components/social-meta";
 
 export default function App() {
   return (
     <Router
-      root={props => (
+      root={(props) => (
         <>
-          <Suspense>
-						<AppHeader />
-            {props.children}
-						<AppFooter />
-            <ToastRegion>
-              <ToastList />
-            </ToastRegion>
-          </Suspense>
+          <MetaProvider>
+            <SocialMeta />
+            <Suspense>
+              <AppHeader />
+              {props.children}
+              <AppFooter />
+              <ToastRegion>
+                <ToastList />
+              </ToastRegion>
+            </Suspense>
+          </MetaProvider>
         </>
       )}
     >
