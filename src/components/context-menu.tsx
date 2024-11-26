@@ -1,7 +1,5 @@
-import { action } from "@solidjs/router";
 import { type Accessor, For, Show, createSignal } from "solid-js";
 import { BlockType } from "~/libs/types";
-import { paintModes } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
 
 interface Position {

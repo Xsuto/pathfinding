@@ -18,7 +18,6 @@ import {
 import { maxMovePerSecond } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
 import { showGenericToast } from "./generic-toast";
-import { GraphView } from "./grid-as-graph";
 import { GridIn2D } from "./grid-in-2d";
 import { Button } from "./ui/button";
 
@@ -163,11 +162,6 @@ export function Maze(props: GenericMazeProps) {
           Algorithm: {props.algorithmName}
         </h1>
         <div class="space-x-2 shrink-0">
-          <GraphView
-            grid={props.sharedGrid}
-            startPoint={props.startPoint}
-            updateCell={props.updateSharedGridCell}
-          />
           <Button onClick={props.removeMaze} variant="destructive">
             <AiOutlineDelete />
           </Button>
