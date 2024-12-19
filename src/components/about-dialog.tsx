@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { getTerrainCost } from "~/libs/algos";
+import { getTerrainCost } from "~/libs/algorithms";
 import { BlockType } from "~/libs/types";
 
 export default function AboutDialog() {

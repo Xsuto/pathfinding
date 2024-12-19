@@ -1,4 +1,4 @@
-import { aStar, bfs, bidirectionalSearch, dfs, dijkstra } from "./algos";
+import { aStar, bfs, bidirectionalSearch, dfs, dijkstra } from "./algorithms";
 import type { Algo, AlgorithmProps, Grid, Position } from "./types";
 import { BlockType } from "./types";
 
@@ -32,6 +32,24 @@ export function encodeGrid(grid: Grid) {
       return result;
     })
     .join("-");
+
+  console.log(`Grid with ${grid.length} rows and ${grid[0].length} columns`);
+  console.table([
+    {
+      type: "Simple Encoding",
+      numberOfCharacters: withoutEncoding.length,
+      value: withoutEncoding,
+    },
+    {
+      type: "RLE Encoding",
+      numberOfCharacters: encoded.length,
+      value: encoded,
+    },
+  ]);
+
+  console.log(
+    `Ratio ${((1 - encoded.length / withoutEncoding.length) * 100).toFixed(2)}%`,
+  );
   return withoutEncoding.length > encoded.length ? encoded : withoutEncoding;
 }
 
@@ -90,7 +108,7 @@ export const algoTypeToTitle = {
   BFS: "Breadth first search",
   DFS: "Depth first search",
   Astar: "A* search",
-  BI: "Bidirectional search",
+  BI: "Bidirectional breadth first search",
   Dijkstra: "Dijkstra search",
 } satisfies Record<Algo, string>;
 

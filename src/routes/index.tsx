@@ -14,7 +14,7 @@ import {
 } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
 
-export default function Home() {
+export default function Board() {
   const { grid, updateGrid, boardSize, algorithms, removeAlgorithm } =
     useUrlState();
   const { state } = useSettingsStore();

@@ -15,7 +15,6 @@ import {
   type Grid,
   type Position,
 } from "~/libs/types";
-import { maxMovePerSecond } from "~/libs/utils";
 import { useSettingsStore } from "~/stores/settings-store";
 import { showGenericToast } from "./generic-toast";
 import { GridIn2D } from "./grid-in-2d";
@@ -82,6 +81,7 @@ export function Maze(props: GenericMazeProps) {
     if (abortControllerRef.current?.signal.aborted) {
       throw new AlgorithmAborted("Algorithm aborted");
     }
+
     startTransition(() => {
       const cell = props.sharedGrid()[row][col];
       if (cell !== BlockType.START && cell !== BlockType.GOAL) {
@@ -89,11 +89,9 @@ export function Maze(props: GenericMazeProps) {
       }
     });
 
-    if (movesPerSecondRef.current !== maxMovePerSecond) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1000 / movesPerSecondRef.current!),
-      );
-    }
+    await new Promise((resolve) =>
+      setTimeout(resolve, 1000 / movesPerSecondRef.current!),
+    );
   };
 
   const startAlgorithm = async () => {

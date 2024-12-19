@@ -25,6 +25,6 @@ export interface AlgorithmProps {
   goal: Position;
   rows: number;
   cols: number;
-  grid: number[][];
+  grid: Grid;
   markCellAsVisited: (row: number, col: number) => Promise<void>;
 }

@@ -101,7 +101,7 @@ export function AlgorithmsDialog() {
                         {algoTypeToTitle[algorithm]}
                       </h3>
                     </div>
-                    <div class="space-x-2">
+                    <div class="space-x-2 min-w-32">
                       <Button
                         variant="outline"
                         size="icon"
