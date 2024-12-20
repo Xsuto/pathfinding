@@ -108,7 +108,7 @@ export const algoTypeToTitle = {
   BFS: "Breadth first search",
   DFS: "Depth first search",
   Astar: "A* search",
-  BI: "Bidirectional breadth first search",
+  BI: "Bidirectional search",
   Dijkstra: "Dijkstra search",
 } satisfies Record<Algo, string>;
 
